@@ -12,7 +12,7 @@
 #endif
 
 // Entry point function for all processes.
-int APIENTRY wWinMain(HINSTANCE hInstance,
+int APIENTRY WinMain(HINSTANCE hInstance,
                       HINSTANCE hPrevInstance,
                       LPTSTR lpCmdLine,
                       int nCmdShow) {

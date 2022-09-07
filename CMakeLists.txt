@@ -1,10 +1,21 @@
 cmake_minimum_required(VERSION 3.15)
 project (CefVPN)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
-file(GLOB_RECURSE SRC_INC_FILES src/*.hpp)
 
-add_executable(${PROJECT_NAME} ${SRC_FILES} ${SRC_INC_FILES})
+add_definitions(
+)
+
+add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${PROJECT_SOURCE_DIR}/include/cef/
+)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    ${PROJECT_SOURCE_DIR}/lib/libcef.lib
+    Ws2_32.lib
+    Dbghelp.lib
+    Shlwapi.lib
+)
 
