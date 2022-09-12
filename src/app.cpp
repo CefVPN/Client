@@ -98,7 +98,7 @@ void SimpleApp::OnContextInitialized() {
   // that instead of the default URL.
   url = command_line->GetSwitchValue("url");
   if (url.empty())
-    url = "https://opstriker.dev";
+    url = "https://github.com";
 
   if (use_views) {
     // Create the BrowserView.
@@ -115,7 +115,7 @@ void SimpleApp::OnContextInitialized() {
 #if defined(OS_WIN)
     // On Windows we need to specify certain flags that will be passed to
     // CreateWindowEx().
-    window_info.SetAsPopup(nullptr, "cefsimple");
+    window_info.SetAsPopup(nullptr, "CefVPN");
 #endif
 
     // Create the first browser window.
