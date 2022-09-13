@@ -44,5 +44,17 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     Powrprof.lib
     Winmm.lib
     delayimp.lib
+
 )
+
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND "mt.exe" -nologo
+            -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.exe.manifest\" \"${CMAKE_CURRENT_SOURCE_DIR}/compatibility.manifest\"
+            -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/build/Debug/${PROJECT_NAME}.exe"\;\#1
+    COMMENT "Adding manifest..."
+)
+
+
 
