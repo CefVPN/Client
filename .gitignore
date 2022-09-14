@@ -3,3 +3,5 @@ bin/
 lib/
 build/
 GPUCache/
+app/node_modules/
+package-lock.json
