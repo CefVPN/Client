@@ -1,6 +1,7 @@
 .App {
   width: 100vw;
   height: 100vh;
+  background-color: #21252B;
 }
 
 body {
@@ -11,10 +12,57 @@ body {
 .Sidebar {
   height: 100%;
   width: 5rem;
-  background-color: aquamarine;
+  background-color: #282C34;
 }
 
+/*
 .Sidebar:hover {
   width: 10rem;
   transition: width 400ms;
+}
+*/
+
+.SidebarList {
+  height: auto;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+
+.SidebarList .row {
+  width: 100%;
+  height: 5rem;
+  list-style-type: none;
+  margin: 0;
+  display: flex;
+  flex: row;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.row #icon {
+  flex: 30%;
+  display: grid;
+  place-items: center;
+}
+
+.row #title {
+  flex: 70%;
+  display: none;
+  white-space: nowrap;
+}
+
+/*
+.Sidebar:hover #title {
+  display: block; 
+}
+*/
+
+.SidebarList .row:hover {
+  cursor: pointer;
+  background-color:#21252B
 }
