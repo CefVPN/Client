@@ -98,7 +98,7 @@ void SimpleApp::OnContextInitialized() {
   const bool use_views = true; //= command_line->HasSwitch("use-views");
 
   // SimpleHandler implements browser-level callbacks.
-  CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views));
+  CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views, nullptr));
 
   // Specify CEF browser settings here.
   CefBrowserSettings browser_settings;

@@ -24,8 +24,8 @@ std::string GetDataURI(const std::string& data, const std::string& mime_type) {
 
 }  // namespace
 
-SimpleHandler::SimpleHandler(bool use_views)
-    : use_views_(use_views), is_closing_(false) {
+SimpleHandler::SimpleHandler(bool use_views, Delegate* delegate)
+    : use_views_(use_views), is_closing_(false), delegate_(delegate) {
   DCHECK(!g_instance);
   g_instance = this;
 }
@@ -124,6 +124,27 @@ void SimpleHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
   frame->LoadURL(GetDataURI(ss.str(), "text/html"));
 }
 
+bool SimpleHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
+                                CefRefPtr<CefDragData> dragData,
+                                CefDragHandler::DragOperationsMask mask) {
+  CEF_REQUIRE_UI_THREAD();
+
+  // Forbid dragging of URLs and files.
+  if ((mask & DRAG_OPERATION_LINK) && !dragData->IsFragment()) {
+    return true;
+  }
+
+  return false;
+}
+
+void SimpleHandler::OnDraggableRegionsChanged(
+    CefRefPtr<CefBrowser> browser,
+    CefRefPtr<CefFrame> frame,
+    const std::vector<CefDraggableRegion>& regions) {
+  CEF_REQUIRE_UI_THREAD();
+
+  SimpleHandler::NotifyDraggableRegions(regions);
+}
 void SimpleHandler::CloseAllBrowsers(bool force_close) {
   if (!CefCurrentlyOn(TID_UI)) {
     // Execute on the UI thread.
@@ -138,6 +159,19 @@ void SimpleHandler::CloseAllBrowsers(bool force_close) {
   BrowserList::const_iterator it = browser_list_.begin();
   for (; it != browser_list_.end(); ++it)
     (*it)->GetHost()->CloseBrowser(force_close);
+}
+
+void SimpleHandler::NotifyDraggableRegions(
+    const std::vector<CefDraggableRegion>& regions) {
+  //if (!CURRENTLY_ON_MAIN_THREAD()) {
+  //  // Execute this method on the main thread.
+  //  MAIN_POST_CLOSURE(
+  //      base::BindOnce(&SimpleHandler::NotifyDraggableRegions, this, regions));
+  //  return;
+  //}
+
+  if (delegate_)
+    delegate_->OnSetDraggableRegions(regions);
 }
 
 // static
