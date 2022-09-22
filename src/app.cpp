@@ -21,15 +21,22 @@ class SimpleWindowDelegate : public CefWindowDelegate {
   void OnWindowCreated(CefRefPtr<CefWindow> window) override {
     // Add the browser view and show the window.
     window->AddChildView(browser_view_);
+    window->CenterWindow(CefSize(850, 550));
     window->Show();
 
     // Give keyboard focus to the browser view.
     browser_view_->RequestFocus();
   }
 
+  bool IsFrameless(CefRefPtr<CefWindow> window) override {
+    return true;
+  }
+
   void OnWindowDestroyed(CefRefPtr<CefWindow> window) override {
     browser_view_ = nullptr;
   }
+
+  //void OnDraggableRegionsChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDragData> dragData, CefDr)
 
   bool CanClose(CefRefPtr<CefWindow> window) override {
     // Allow the window to close if the browser says it's OK.
@@ -40,7 +47,11 @@ class SimpleWindowDelegate : public CefWindowDelegate {
   }
 
   CefSize GetPreferredSize(CefRefPtr<CefView> view) override {
-    return CefSize(800, 600);
+    return CefSize(850, 550);
+  }
+
+  CefSize GetMinimumSize(CefRefPtr<CefView> view) override {
+    return CefSize(850, 550);
   }
 
  private:
@@ -84,7 +95,7 @@ void SimpleApp::OnContextInitialized() {
   // Create the browser using the Views framework if "--use-views" is specified
   // via the command-line. Otherwise, create the browser using the native
   // platform framework.
-  const bool use_views = command_line->HasSwitch("use-views");
+  const bool use_views = true; //= command_line->HasSwitch("use-views");
 
   // SimpleHandler implements browser-level callbacks.
   CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views));

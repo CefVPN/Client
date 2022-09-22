@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include "main.hpp"
 
 #include "include/cef_command_line.h"
 #include "include/cef_sandbox_win.h"
