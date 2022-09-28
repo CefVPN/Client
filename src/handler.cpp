@@ -1,3 +1,7 @@
+// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights
+// reserved. Use of this source code is governed by a BSD-style license that
+// can be found in the LICENSE file.
+
 #include "handler.hpp"
 
 #include <sstream>
@@ -13,7 +17,7 @@
 
 namespace {
 
-SimpleHandler* g_instance = nullptr;
+CefVHandler* g_instance = nullptr;
 
 // Returns a data: URI with the specified contents.
 std::string GetDataURI(const std::string& data, const std::string& mime_type) {
@@ -24,22 +28,22 @@ std::string GetDataURI(const std::string& data, const std::string& mime_type) {
 
 }  // namespace
 
-SimpleHandler::SimpleHandler(bool use_views, Delegate* delegate)
-    : use_views_(use_views), is_closing_(false), delegate_(delegate) {
+CefVHandler::CefVHandler(bool use_views)
+    : use_views_(use_views), is_closing_(false) {
   DCHECK(!g_instance);
   g_instance = this;
 }
 
-SimpleHandler::~SimpleHandler() {
+CefVHandler::~CefVHandler() {
   g_instance = nullptr;
 }
 
 // static
-SimpleHandler* SimpleHandler::GetInstance() {
+CefVHandler* CefVHandler::GetInstance() {
   return g_instance;
 }
 
-void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
+void CefVHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
                                   const CefString& title) {
   CEF_REQUIRE_UI_THREAD();
 
@@ -54,18 +58,25 @@ void SimpleHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
     }
   } else if (!IsChromeRuntimeEnabled()) {
     // Set the title of the window using platform APIs.
-    PlatformTitleChange(browser, title);
+    //PlatformTitleChange(browser, title);
   }
 }
 
-void SimpleHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
+void CefVHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
   CEF_REQUIRE_UI_THREAD();
 
   // Add to the list of existing browsers.
   browser_list_.push_back(browser);
+
+  if (!m_Browser.get()) {
+		// We need to keep the main child window, but not popup windows
+		m_Browser     = browser;
+		m_BrowserHandle = browser->GetHost()->GetWindowHandle();
+	}
+
 }
 
-bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser) {
+bool CefVHandler::DoClose(CefRefPtr<CefBrowser> browser) {
   CEF_REQUIRE_UI_THREAD();
 
   // Closing the main window requires special handling. See the DoClose()
@@ -81,7 +92,7 @@ bool SimpleHandler::DoClose(CefRefPtr<CefBrowser> browser) {
   return false;
 }
 
-void SimpleHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
+void CefVHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
   CEF_REQUIRE_UI_THREAD();
 
   // Remove from the list of existing browsers.
@@ -93,13 +104,18 @@ void SimpleHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
     }
   }
 
+  if (m_BrowserHandle == browser->GetHost()->GetWindowHandle()) {
+		// Free the browser pointer so that the browser can be destroyed
+		m_Browser = nullptr;
+	}
+
   if (browser_list_.empty()) {
     // All browser windows have closed. Quit the application message loop.
     CefQuitMessageLoop();
   }
 }
 
-void SimpleHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
+void CefVHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame,
                                 ErrorCode errorCode,
                                 const CefString& errorText,
@@ -124,31 +140,10 @@ void SimpleHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
   frame->LoadURL(GetDataURI(ss.str(), "text/html"));
 }
 
-bool SimpleHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
-                                CefRefPtr<CefDragData> dragData,
-                                CefDragHandler::DragOperationsMask mask) {
-  CEF_REQUIRE_UI_THREAD();
-
-  // Forbid dragging of URLs and files.
-  if ((mask & DRAG_OPERATION_LINK) && !dragData->IsFragment()) {
-    return true;
-  }
-
-  return false;
-}
-
-void SimpleHandler::OnDraggableRegionsChanged(
-    CefRefPtr<CefBrowser> browser,
-    CefRefPtr<CefFrame> frame,
-    const std::vector<CefDraggableRegion>& regions) {
-  CEF_REQUIRE_UI_THREAD();
-
-  SimpleHandler::NotifyDraggableRegions(regions);
-}
-void SimpleHandler::CloseAllBrowsers(bool force_close) {
+void CefVHandler::CloseAllBrowsers(bool force_close) {
   if (!CefCurrentlyOn(TID_UI)) {
     // Execute on the UI thread.
-    CefPostTask(TID_UI, base::BindOnce(&SimpleHandler::CloseAllBrowsers, this,
+    CefPostTask(TID_UI, base::BindOnce(&CefVHandler::CloseAllBrowsers, this,
                                        force_close));
     return;
   }
@@ -161,21 +156,8 @@ void SimpleHandler::CloseAllBrowsers(bool force_close) {
     (*it)->GetHost()->CloseBrowser(force_close);
 }
 
-void SimpleHandler::NotifyDraggableRegions(
-    const std::vector<CefDraggableRegion>& regions) {
-  //if (!CURRENTLY_ON_MAIN_THREAD()) {
-  //  // Execute this method on the main thread.
-  //  MAIN_POST_CLOSURE(
-  //      base::BindOnce(&SimpleHandler::NotifyDraggableRegions, this, regions));
-  //  return;
-  //}
-
-  if (delegate_)
-    delegate_->OnSetDraggableRegions(regions);
-}
-
 // static
-bool SimpleHandler::IsChromeRuntimeEnabled() {
+bool CefVHandler::IsChromeRuntimeEnabled() {
   static int value = -1;
   if (value == -1) {
     CefRefPtr<CefCommandLine> command_line =

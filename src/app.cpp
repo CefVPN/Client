@@ -1,3 +1,7 @@
+// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights
+// reserved. Use of this source code is governed by a BSD-style license that
+// can be found in the LICENSE file.
+
 #include "app.hpp"
 
 #include <string>
@@ -28,15 +32,9 @@ class SimpleWindowDelegate : public CefWindowDelegate {
     browser_view_->RequestFocus();
   }
 
-  bool IsFrameless(CefRefPtr<CefWindow> window) override {
-    return true;
-  }
-
   void OnWindowDestroyed(CefRefPtr<CefWindow> window) override {
     browser_view_ = nullptr;
   }
-
-  //void OnDraggableRegionsChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDragData> dragData, CefDr)
 
   bool CanClose(CefRefPtr<CefWindow> window) override {
     // Allow the window to close if the browser says it's OK.
@@ -47,10 +45,6 @@ class SimpleWindowDelegate : public CefWindowDelegate {
   }
 
   CefSize GetPreferredSize(CefRefPtr<CefView> view) override {
-    return CefSize(850, 550);
-  }
-
-  CefSize GetMinimumSize(CefRefPtr<CefView> view) override {
     return CefSize(850, 550);
   }
 
@@ -84,9 +78,9 @@ class SimpleBrowserViewDelegate : public CefBrowserViewDelegate {
 
 }  // namespace
 
-SimpleApp::SimpleApp() {}
-
-void SimpleApp::OnContextInitialized() {
+CefVApp::CefVApp() {}
+/*
+void CefVApp::OnContextInitialized() {
   CEF_REQUIRE_UI_THREAD();
 
   CefRefPtr<CefCommandLine> command_line =
@@ -95,10 +89,10 @@ void SimpleApp::OnContextInitialized() {
   // Create the browser using the Views framework if "--use-views" is specified
   // via the command-line. Otherwise, create the browser using the native
   // platform framework.
-  const bool use_views = true; //= command_line->HasSwitch("use-views");
+  const bool use_views = false;
 
   // SimpleHandler implements browser-level callbacks.
-  CefRefPtr<SimpleHandler> handler(new SimpleHandler(use_views, nullptr));
+  CefRefPtr<CefVHandler> handler(new CefVHandler(use_views));
 
   // Specify CEF browser settings here.
   CefBrowserSettings browser_settings;
@@ -109,7 +103,7 @@ void SimpleApp::OnContextInitialized() {
   // that instead of the default URL.
   url = command_line->GetSwitchValue("url");
   if (url.empty())
-    url = "http://localhost:3000/";
+    url = "http://www.google.com";
 
   if (use_views) {
     // Create the BrowserView.
@@ -126,7 +120,7 @@ void SimpleApp::OnContextInitialized() {
 #if defined(OS_WIN)
     // On Windows we need to specify certain flags that will be passed to
     // CreateWindowEx().
-    window_info.SetAsPopup(nullptr, "CefVPN");
+    //window_info.SetAsPopup(nullptr, "cefsimple");
 #endif
 
     // Create the first browser window.
@@ -134,8 +128,9 @@ void SimpleApp::OnContextInitialized() {
                                   nullptr, nullptr);
   }
 }
+*/
 
-CefRefPtr<CefClient> SimpleApp::GetDefaultClient() {
+CefRefPtr<CefClient> CefVApp::GetDefaultClient() {
   // Called when a new browser window is created via the Chrome runtime UI.
-  return SimpleHandler::GetInstance();
+  return CefVHandler::GetInstance();
 }

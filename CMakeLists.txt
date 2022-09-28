@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/include/cef/
+    ${PROJECT_SOURCE_DIR}/include/
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
