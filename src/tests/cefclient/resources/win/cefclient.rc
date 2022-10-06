@@ -160,12 +160,12 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "Chromium Embedded Framework (CEF) Client Application"
+            VALUE "FileDescription", "CefVPN"
             VALUE "FileVersion", CEF_VERSION
-            VALUE "InternalName", "cefclient"
-            VALUE "LegalCopyright", "Copyright (C) " MAKE_STRING(COPYRIGHT_YEAR) " The Chromium Embedded Framework Authors"
-            VALUE "OriginalFilename", "cefclient.exe"
-            VALUE "ProductName", "Chromium Embedded Framework (CEF) Client Application"
+            VALUE "InternalName", "CefVPN"
+            VALUE "LegalCopyright", "Copyright (C) " MAKE_STRING(COPYRIGHT_YEAR) " CefVPN Authors"
+            VALUE "OriginalFilename", "CefVPN.exe"
+            VALUE "ProductName", "CefVPN"
             VALUE "ProductVersion", CEF_VERSION
         END
     END
@@ -210,8 +210,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_APP_TITLE           "cefclient"
-    IDC_CEFCLIENT           "CEFCLIENT"
+    IDS_APP_TITLE           "CefVPN"
+    IDC_CEFCLIENT           "CefVPN"
 END
 
 #endif    // English (U.S.) resources
