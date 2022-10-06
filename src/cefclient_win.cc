@@ -72,6 +72,8 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
   auto context = std::make_unique<MainContextImpl>(command_line, true);
 
   CefSettings settings;
+  settings.multi_threaded_message_loop = 1;
+  settings.command_line_args_disabled = 1;
 
 #if !defined(CEF_USE_SANDBOX)
   settings.no_sandbox = true;
@@ -98,8 +100,8 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
   auto window_config = std::make_unique<RootWindowConfig>();
   window_config->always_on_top =
       command_line->HasSwitch(switches::kAlwaysOnTop);
-  window_config->with_controls =
-      !command_line->HasSwitch(switches::kHideControls);
+  window_config->with_controls = false;
+      //!command_line->HasSwitch(switches::kHideControls);
   window_config->with_osr =
       settings.windowless_rendering_enabled ? true : false;
 

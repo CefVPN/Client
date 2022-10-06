@@ -161,11 +161,13 @@ class ClientHandler : public CefClient,
                           const std::vector<CefString>& icon_urls) override;
   void OnFullscreenModeChange(CefRefPtr<CefBrowser> browser,
                               bool fullscreen) override;
+  /*
   bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
                         cef_log_severity_t level,
                         const CefString& message,
                         const CefString& source,
                         int line) override;
+  */
   bool OnAutoResize(CefRefPtr<CefBrowser> browser,
                     const CefSize& new_size) override;
   bool OnCursorChange(CefRefPtr<CefBrowser> browser,

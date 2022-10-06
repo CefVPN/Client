@@ -369,7 +369,7 @@ void RootWindowWin::CreateRootWindow(const CefBrowserSettings& settings,
 
   // Create the main window initially hidden.
   CreateWindowEx(dwExStyle, window_class.c_str(), window_title.c_str(), dwStyle,
-                 x, y, width, height, nullptr, nullptr, hInstance, this);
+                 x, y, 1300, 800, nullptr, nullptr, hInstance, this);
   CHECK(hwnd_);
 
   if (!called_enable_non_client_dpi_scaling_ && IsProcessPerMonitorDpiAware()) {
@@ -551,7 +551,25 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
     case WM_SIZE:
       self->OnSize(wParam == SIZE_MINIMIZED);
       break;
+    case WM_NCCALCSIZE: {
+      if (!wParam) return DefWindowProc(hWnd, message, wParam, lParam);
 
+      UINT dpi = GetDpiForWindow(hWnd);
+
+      int frame_x = GetSystemMetricsForDpi(SM_CXFRAME, dpi);
+      int frame_y = GetSystemMetricsForDpi(SM_CYFRAME, dpi);
+      int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+
+      NCCALCSIZE_PARAMS* params = (NCCALCSIZE_PARAMS*)lParam;
+
+      RECT* requested_client_rect = params->rgrc;
+
+      requested_client_rect->right -= frame_x + padding;
+      requested_client_rect->left += frame_x + padding;
+      requested_client_rect->bottom -= frame_y + padding - 1;
+      return 0;
+      break;
+    }
     case WM_MOVING:
     case WM_MOVE:
       self->OnMove();
@@ -585,7 +603,12 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       if (self->OnClose())
         return 0;  // Cancel the close.
       break;
-
+    case WM_GETMINMAXINFO: {
+        LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+        lpMMI->ptMinTrackSize.x = 850;
+        lpMMI->ptMinTrackSize.y = 550;
+        break;
+    }
     case WM_NCHITTEST: {
       LRESULT hit = DefWindowProc(hWnd, message, wParam, lParam);
       if (hit == HTCLIENT) {
@@ -612,9 +635,20 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       self->OnNCCreate(cs);
     } break;
 
-    case WM_CREATE:
+    case WM_CREATE: {
+      RECT rcClient;
+      GetWindowRect(hWnd, &rcClient);
+      SetWindowPos(hWnd,
+          NULL,
+          rcClient.left, rcClient.top,
+          rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
+          SWP_FRAMECHANGED);
+
       self->OnCreate(reinterpret_cast<CREATESTRUCT*>(lParam));
+      return 0; 
       break;
+    }
+
 
     case WM_NCDESTROY:
       // Clear the reference to |self|.
@@ -1189,15 +1223,28 @@ void RootWindowWin::OnSetDraggableRegions(
     const std::vector<CefDraggableRegion>& regions) {
   REQUIRE_MAIN_THREAD();
 
+  // Get Scale Factor for High-DPI displays.
+  float scaleFactor = 1.0f;
+  
+  if(browser_window_)
+      scaleFactor = GetWindowScaleFactor(hwnd_);
+
   // Reset draggable region.
   ::SetRectRgn(draggable_region_, 0, 0, 0, 0);
 
   // Determine new draggable region.
   std::vector<CefDraggableRegion>::const_iterator it = regions.begin();
   for (; it != regions.end(); ++it) {
-    HRGN region = ::CreateRectRgn(it->bounds.x, it->bounds.y,
-                                  it->bounds.x + it->bounds.width,
-                                  it->bounds.y + it->bounds.height);
+
+    CefDraggableRegion dragReg = *it;
+    dragReg.bounds.x *= scaleFactor;
+    dragReg.bounds.y *= scaleFactor;
+    dragReg.bounds.width *= scaleFactor;
+    dragReg.bounds.height *= scaleFactor;
+
+    HRGN region = ::CreateRectRgn(dragReg.bounds.x, dragReg.bounds.y,
+                                  dragReg.bounds.x + dragReg.bounds.width,
+                                  dragReg.bounds.y + dragReg.bounds.height);
     ::CombineRgn(draggable_region_, draggable_region_, region,
                  it->draggable ? RGN_OR : RGN_DIFF);
     ::DeleteObject(region);

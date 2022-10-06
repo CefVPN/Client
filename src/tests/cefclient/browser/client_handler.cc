@@ -328,7 +328,7 @@ ClientHandler::ClientHandler(Delegate* delegate,
       delegate_(delegate),
       browser_count_(0),
       console_log_file_(MainContext::Get()->GetConsoleLogPath()),
-      first_console_message_(true),
+      first_console_message_(false),
       focus_on_editable_field_(false),
       initial_navigation_(true) {
   DCHECK(!console_log_file_.empty());
@@ -582,7 +582,7 @@ void ClientHandler::OnFullscreenModeChange(CefRefPtr<CefBrowser> browser,
 
   NotifyFullscreen(fullscreen);
 }
-
+/*
 bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
                                      cef_log_severity_t level,
                                      const CefString& message,
@@ -626,6 +626,7 @@ bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 
   return false;
 }
+*/
 
 bool ClientHandler::OnAutoResize(CefRefPtr<CefBrowser> browser,
                                  const CefSize& new_size) {
