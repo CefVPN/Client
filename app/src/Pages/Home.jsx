@@ -1,12 +1,12 @@
 import React from 'react';
-import './Home.css';
+import './Page.css';
 
 const Home = () => {
-  return (
-    <div className='Home'>
-      Hello Welcome to LYCF
-    </div>
-  );
+    return (
+        <div className='content'>
+            Hllow World
+        </div>
+    );
 };
 
 export default Home;

@@ -1,22 +1,22 @@
 import * as React from 'react';
 import Sidebar from './Components/sidebar';
 import Titlebar from './Components/Titlebar';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Home from './Pages/Home';
+import { Routes, Route, BrowserRouter} from 'react-router-dom';
 import Config from './Pages/Config';
+import Home from './Pages/Home';
 import Import from './Pages/Import';
 import "./App.css";
 
 function App() {
   return (
     <BrowserRouter>
-    <Titlebar />
-    <Sidebar />
+      <Titlebar />
       <Routes>
-        <Route path='/Home' element={<Home />} />
+        <Route path='/' element={<Home />} />
         <Route path='/config' element={<Config />} />
         <Route path='/import' element={<Import />} />
       </Routes>
+      <Sidebar />
     </BrowserRouter>
   );
 }

@@ -2,8 +2,8 @@ import React from 'react';
 
 const Import = () => {
     return (
-        <div>
-            Import Profile
+        <div className="content">
+            Import Profile...
         </div>
     );
 };

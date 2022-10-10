@@ -1,0 +1,16 @@
+.content {
+    margin-left: 5rem;
+    margin-top: 29px;
+    position: absolute;
+    color: white;
+    display: flex;
+}
+
+body {
+    background-color: #21252B;
+}
+
+.config {
+    width: 100;
+    background-color: aqua;
+  }
