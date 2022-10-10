@@ -4,7 +4,9 @@ import './Page.css';
 const Home = () => {
     return (
         <div className='content'>
-            Hllow World
+            <div className="dashboard">
+                Welcome to CefVPN!
+            </div>
         </div>
     );
 };
