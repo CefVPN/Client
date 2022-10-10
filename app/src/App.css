@@ -7,14 +7,20 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: #21252B;
 }
 
 .Sidebar {
-  height: 100%;
+  height: 100vh;
   width: 5rem;
   background-color: #282C34;
   transition: width 200ms;
   position: relative;
+  -webkit-app-region: no-drag;
+}
+
+.Container {
+  display: flex;
 }
 
 
@@ -28,6 +34,7 @@ body {
   height: auto;
   padding: 0;
   margin: 0;
+  margin-top: 0px;
   width: 100%;
 }
 
@@ -44,7 +51,6 @@ body {
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
 
 .row #icon {
   flex: 30%;
@@ -73,11 +79,17 @@ body {
   margin-left: 5px;
 }
 
+.SidebarList:last-child {
+  margin-top: auto;
+}
+
 .dragRegion {
   height: 29px;
-  background-color: bisque;
+  background-color: aqua;
+  display: flex;
   position: absolute;
   margin: 0;
   width: 100%;
   -webkit-app-region: drag;
+  float: left;
 }

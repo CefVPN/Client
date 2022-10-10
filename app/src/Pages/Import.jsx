@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Config = () => {
+const Import = () => {
     return (
         <div>
-            Settings
+            Import Profile
         </div>
     );
 };
 
-export default Config;
+export default Import;

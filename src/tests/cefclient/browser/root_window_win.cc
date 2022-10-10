@@ -76,9 +76,9 @@ bool IsProcessPerMonitorDpiAware() {
   return per_monitor_dpi_aware == PerMonitorDpiAware::PER_MONITOR_DPI_AWARE;
 }
 
-// DPI value for 1x scale factor.
 #define DPI_1X 96.0f
 
+// DPI value for 1x scale factor.
 float GetWindowScaleFactor(HWND hwnd) {
   if (hwnd && IsProcessPerMonitorDpiAware()) {
     typedef UINT(WINAPI * GetDpiForWindowPtr)(HWND);
@@ -97,6 +97,16 @@ int GetButtonWidth(HWND hwnd) {
 
 int GetURLBarHeight(HWND hwnd) {
   return LogicalToDevice(URLBAR_HEIGHT, GetWindowScaleFactor(hwnd));
+}
+
+// Check Whether Window is Maximized.
+bool isWindowMaximized(HWND hwnd) {
+  WINDOWPLACEMENT placement = {0};
+  placement.length = sizeof(WINDOWPLACEMENT);
+  if (GetWindowPlacement(hwnd, &placement)) {
+    return placement.showCmd == SW_SHOWMAXIMIZED;
+  }
+  return false;
 }
 
 }  // namespace
@@ -562,11 +572,25 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
 
       NCCALCSIZE_PARAMS* params = (NCCALCSIZE_PARAMS*)lParam;
 
+      float scaleFactor = 1.0f;
+
+      if(hWnd)
+          scaleFactor = GetWindowScaleFactor(hWnd);
+
       RECT* requested_client_rect = params->rgrc;
 
       requested_client_rect->right -= frame_x + padding;
       requested_client_rect->left += frame_x + padding;
       requested_client_rect->bottom -= frame_y + padding - 1;
+
+      if(isWindowMaximized(hWnd))
+      {
+        requested_client_rect->top += padding + 4.9;
+      } else {
+        requested_client_rect->top += padding - 4.9;
+      }
+        
+
       return 0;
       break;
     }
@@ -615,6 +639,17 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
         POINTS points = MAKEPOINTS(lParam);
         POINT point = {points.x, points.y};
         ::ScreenToClient(hWnd, &point);
+
+        // Looks like adjustment happening in NCCALCSIZE is messing with the detection
+        // of the top hit area so manually fixing that.
+        if(!isWindowMaximized(hWnd))
+        {
+          if (point.y >= 0 && point.y <= 6 && point.x >= 5) {
+            return hit = HTTOP;
+          } else if(point.x <= 5 && point.y <= 6)
+            return HTTOPLEFT;
+        }
+
         if (::PtInRegion(self->draggable_region_, point.x, point.y)) {
           // If cursor is inside a draggable region return HTCAPTION to allow
           // dragging.
@@ -1164,6 +1199,8 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
       POINTS points = MAKEPOINTS(lParam);
       POINT point = {points.x, points.y};
       ::ScreenToClient(hWnd, &point);
+      if(point.y >= 0 && point.y <= 6 && point.x >= 5)
+        return HTTRANSPARENT;
       if (::PtInRegion(hRegion, point.x, point.y)) {
         // Let the parent window handle WM_NCHITTEST by returning HTTRANSPARENT
         // in child windows.
