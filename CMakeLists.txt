@@ -167,11 +167,26 @@ set(CEFCLIENT_WINDOWS_SRCS
     src/tests/cefclient/resources/win/cefclient.rc
 )
 
+set(VCPKG_PATH ${PROJECT_SOURCE_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET})
+
+#VCPKG
+find_package(asio CONFIG REQUIRED)
+find_package(lz4 CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED)
+find_path(TAP_WINDOWS6_INCLUDE_DIRS "tap-windows.h")
+
+set(OPENVPN3_SRCS
+    src/ovpncli.hpp
+    src/ovpncli.cpp
+)
+
 set(CEFCLIENT_SRCS
-${CEFCLIENT_BROWSER_SRCS}
-${CEFCLIENT_COMMON_SRCS}
-${CEFCLIENT_RENDERER_SRCS}
-${CEFCLIENT_WINDOWS_SRCS}
+    ${CEFCLIENT_BROWSER_SRCS}
+    ${CEFCLIENT_COMMON_SRCS}
+    ${CEFCLIENT_RENDERER_SRCS}
+    ${CEFCLIENT_WINDOWS_SRCS}
+    ${OPENVPN3_SRCS}
 )
 
 set(SRC_FILES
@@ -179,7 +194,22 @@ set(SRC_FILES
     ${CEFCLIENT_SRCS}
 )
 
-add_definitions(
+set(OPENVPN3_DEFINES
+    -DTAP_WIN_COMPONENT_ID=tap0901
+    -DASIO_STANDALONE
+    -DUSE_ASIO
+    -DUSE_OPENSSL
+    -DHAVE_LZ4
+    -DOPENVPN_COMMAND_AGENT
+    -DHAVE_JSONCPP
+    -DLZ4_DISABLE_DEPRECATE_WARNINGS
+    -DMBEDTLS_DEPRECATED_REMOVED
+    -D_CRT_SECURE_NO_WARNINGS
+    -DASIO_DISABLE_LOCAL_SOCKETS
+    -DOVPNAGENT_DISABLE_PATH_CHECK
+)
+
+set(WINDOWS_DEFS
     -DWIN32
     -D_WINDOWS
     -D__STDC_CONSTANT_MACROS
@@ -193,10 +223,20 @@ add_definitions(
     -DWIN32_LEAN_AND_MEAN
     -D_HAS_EXCEPTIONS=0
     -DPSAPI_VERSION=1
-    -DCEF_USE_SANDBOX
-    -DCEF_USE_ATL
     -D_HAS_ITERATOR_DEBUGGING=0
+)
+
+set(CEF_DEFS
+    -DCEF_USE_SANDBOX
+    -DCEF_USE_ATL   
+)
+
+add_definitions(
     -DCMAKE_INTDIR="Debug"
+    ${WINDOWS_DEFS}
+    ${CEF_DEFS}
+    ${OPENVPN3_DEFINES}
+    -DVCPKG_MANIFEST_INSTALL=ON
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES} ${CEFCLIENT_SRCS})
@@ -225,6 +265,17 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     Oleacc.lib
     Imm32.lib
     D3D11.lib
+)
+
+# VCPKG libs...
+target_link_libraries(
+    ${PROJECT_NAME} PRIVATE
+    asio
+    asio::asio
+    lz4::lz4
+    OpenSSL::SSL
+    jsoncpp_object 
+    jsoncpp_static 
 )
 
 add_custom_command(
