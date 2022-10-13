@@ -104,7 +104,7 @@ namespace openvpn {
 
 	for (ret = Process32First(process_snapshot, &entry); ret; ret = Process32Next(process_snapshot, &entry))
 	  {
-	    if (!_stricmp(entry.szExeFile, "winlogon.exe"))
+	    if (!_wcsicmp(entry.szExeFile, L"winlogon.exe"))
 	      {
 		pid = entry.th32ProcessID;
 		break;

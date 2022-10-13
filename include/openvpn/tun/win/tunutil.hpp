@@ -474,12 +474,12 @@ namespace openvpn {
 		continue;
 
 	      BufferAllocatedType<char, thread_unsafe_refcount> buf_dev_inst_id(size, BufferAllocated::CONSTRUCT_ZERO);
-	      if (!SetupDiGetDeviceInstanceId(device_info_set, &dev_info_data, buf_dev_inst_id.data(), size, &size))
+	      if (!SetupDiGetDeviceInstanceIdA(device_info_set, &dev_info_data, buf_dev_inst_id.data(), size, &size))
 		continue;
 	      buf_dev_inst_id.set_size(size);
 
 	      ULONG dev_interface_list_size = 0;
-	      CONFIGRET cr = CM_Get_Device_Interface_List_Size(&dev_interface_list_size,
+	      CONFIGRET cr = CM_Get_Device_Interface_List_SizeA(&dev_interface_list_size,
 							       (LPGUID)& GUID_DEVINTERFACE_NET,
 							       buf_dev_inst_id.data(),
 							       CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
@@ -488,7 +488,7 @@ namespace openvpn {
 		continue;
 
 	      BufferAllocatedType<char, thread_unsafe_refcount> buf_dev_iface_list(dev_interface_list_size, BufferAllocated::CONSTRUCT_ZERO);
-	      cr = CM_Get_Device_Interface_List((LPGUID)& GUID_DEVINTERFACE_NET, buf_dev_inst_id.data(),
+	      cr = CM_Get_Device_Interface_ListA((LPGUID)& GUID_DEVINTERFACE_NET, buf_dev_inst_id.data(),
 						buf_dev_iface_list.data(),
       						dev_interface_list_size,
 						CM_GET_DEVICE_INTERFACE_LIST_PRESENT);

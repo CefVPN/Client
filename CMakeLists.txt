@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.15)
-project (CefVPN)
+cmake_minimum_required(VERSION 3.5)
+project (CefVPN VERSION 0.1.0)
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+#set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 #Source Files...
 set(CEFCLIENT_BROWSER_SRCS
@@ -167,7 +168,7 @@ set(CEFCLIENT_WINDOWS_SRCS
     src/tests/cefclient/resources/win/cefclient.rc
 )
 
-set(VCPKG_PATH ${PROJECT_SOURCE_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET})
+set(VCPKG_PATH ${PROJECT_SOURCE_DIR}/bin/vcpkg_installed/${VCPKG_TARGET_TRIPLET})
 
 #VCPKG
 find_package(asio CONFIG REQUIRED)
@@ -231,6 +232,14 @@ set(CEF_DEFS
     -DCEF_USE_ATL   
 )
 
+set(OPENVPN3_DEP_LIBS
+    Iphlpapi.lib
+    Wininet.lib
+    Rpcrt4.lib
+    Wtsapi32.lib
+    Fwpuclnt.lib
+)
+
 add_definitions(
     -DCMAKE_INTDIR="Debug"
     ${WINDOWS_DEFS}
@@ -246,6 +255,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/include/
     ${PROJECT_SOURCE_DIR}/include/src/
     ${PROJECT_SOURCE_DIR}/src/
+    ${VCPKG_PATH}/include/
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -265,6 +275,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     Oleacc.lib
     Imm32.lib
     D3D11.lib
+    ${OPENVPN3_DEP_LIBS}
 )
 
 # VCPKG libs...
@@ -276,6 +287,12 @@ target_link_libraries(
     OpenSSL::SSL
     jsoncpp_object 
     jsoncpp_static 
+)
+target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
+
+target_include_directories(
+    ${PROJECT_NAME} PRIVATE 
+    ${TAP_WINDOWS6_INCLUDE_DIRS}
 )
 
 add_custom_command(
