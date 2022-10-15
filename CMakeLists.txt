@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project (CefVPN VERSION 0.1.0)
+project (CefVPN)
 
 #set(CMAKE_CXX_FLAGS_RELEASE "/MT")
 set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
@@ -300,7 +300,7 @@ add_custom_command(
     POST_BUILD
     COMMAND "mt.exe" -nologo
             -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.exe.manifest\" \"${CMAKE_CURRENT_SOURCE_DIR}/compatibility.manifest\"
-            -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/build/Debug/${PROJECT_NAME}.exe"\;\#1
+            -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/bin/Debug/${PROJECT_NAME}.exe"\;\#1
     COMMENT "Adding manifest..."
 )
 

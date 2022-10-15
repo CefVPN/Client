@@ -1,0 +1,32 @@
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO OPstriker/jsoncpp
+    REF 1.9.5.1
+    SHA512 8def71f01a9760aa903ba662cfdda419950ee3c5824b815cf3ee7689ccaded04832a6039a4a1adbaf3d9d622de24c496750596c7bf9d880c7221f48d5cf3090d
+    HEAD_REF master
+)
+
+string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "static" JSONCPP_STATIC)
+string(COMPARE EQUAL "${VCPKG_CRT_LINKAGE}" "static" STATIC_CRT)
+
+vcpkg_cmake_configure(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS 
+        -DJSONCPP_WITH_CMAKE_PACKAGE=ON
+        -DBUILD_STATIC_LIBS=${JSONCPP_STATIC}
+        -DJSONCPP_STATIC_WINDOWS_RUNTIME=${STATIC_CRT}
+        -DJSONCPP_WITH_PKGCONFIG_SUPPORT=OFF
+        -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF
+        -DJSONCPP_WITH_TESTS=OFF
+        -DJSONCPP_WITH_EXAMPLE=OFF
+)
+
+vcpkg_cmake_install()
+
+vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/jsoncpp)
+
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
+
+vcpkg_copy_pdbs()
+
+file(INSTALL "${SOURCE_PATH}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
