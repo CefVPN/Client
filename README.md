@@ -22,7 +22,7 @@
 - ### Windows:
 ```
 > git clone https://github.com/CefVPN/CefVPN.git CefVPN && cd CefVPN
-> cmake -B bin -S . -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
+> cmake -B bin -S . -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DVCPKG_OVERLAY_PORTS=deps\ports
 > cmake --build bin --config Release --target CefVPN
 ```
 - ### Linux/macOS:
