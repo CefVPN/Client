@@ -1,12 +1,11 @@
 import React from 'react'
-import { sidebarData } from './sidebarData';
-import Titlebar from './Titlebar';
+import { SidebarData } from './SidebarData';
 
-function sidebar() {
+export default function Sidebar() {
   return (
-    <div className='Sidebar'>
+    <div className='Sidebar h-screen w-20 bg-Sidebar_dbg'>
       <ul className='SidebarList'>
-        {sidebarData.map((val, key) => {
+        {SidebarData.map((val, key) => {
           return (
             <li 
             key={key} 
@@ -24,7 +23,6 @@ function sidebar() {
        })}
       </ul>
     </div>
-  );
+  )
 }
 
-export default sidebar

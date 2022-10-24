@@ -4,7 +4,7 @@ import { IconFileImport } from '@tabler/icons';
 import { IconSettings } from '@tabler/icons';
 import { IconPalette } from '@tabler/icons';
 
-export const sidebarData = [
+export const SidebarData = [
     {
         title: "Home",
         icon: <IconHome />,
