@@ -9,7 +9,10 @@ module.exports = {
       colors: {
         main_dbg: "#21252B",
         Sidebar_dbg: "#282C34"
-      }
+      },
+      transitionProperty: {
+        'width': 'width'
+      },
     },
   },
   plugins: [],

@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Sidebar from '../components/Sidebar'
+import Dash from './Dash'
 
 export default function Home() {
   return (
@@ -7,7 +8,10 @@ export default function Home() {
       <Head>
         <title>CefVPN</title>
       </Head>
-      <Sidebar />
+      <div className="app">
+        <Dash />
+        <Sidebar /> 
+      </div>
     </div>
   )
 }
