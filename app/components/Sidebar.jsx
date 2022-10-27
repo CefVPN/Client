@@ -14,7 +14,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className='Sidebar h-screen w-20 bg-Sidebar_dbg transition-[width] duration-300 relative hover:w-48' 
+    <div className='Sidebar h-screen w-20 bg-Sidebar_dbg transition-[width] duration-300 relative shadow-md shadow-gray-900 hover:w-56'
     onMouseOver={handleMouseOver}
     onMouseOut={handleMouseOut} 
     >
@@ -23,13 +23,13 @@ export default function Sidebar() {
           return (
             <li 
             key={key} 
-            className="row text-white flex mb-8 justify-center w-full"
+            className="row text-white flex mb-8 h-full hover:bg-slate-600 cursor-pointer"
             onClick={() => {
               window.location.pathname = val.link;
               }}
             > 
-              <div id='icon' className="stroke-white place-items-center">{val.icon}</div>{" "}
-              <div id="title" className={isHovering ? "whitespace-nowrap ml-4" : "hidden"}>
+              <div id='icon' className="stroke-white place-items-center ml-7">{val.icon}</div>{" "}
+              <div id="title" className={isHovering ? "whitespace-nowrap ml-7 transition-all delay-1000" : "whitespace-nowrap hidden"}>
                 {val.title}
               </div>
             </li>
