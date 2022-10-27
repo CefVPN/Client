@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Sidebar from '../components/Sidebar'
+import Titlebar from '../components/Titlebar'
 import Dash from './Dash'
 
 export default function Home() {
@@ -10,8 +11,9 @@ export default function Home() {
       </Head>
       <div className="app">
         <Dash />
-        <Sidebar /> 
+        <Titlebar />
       </div>
+      <Sidebar /> 
     </div>
   )
 }

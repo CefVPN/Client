@@ -14,7 +14,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className='Sidebar h-screen w-20 bg-Sidebar_dbg transition-[width] duration-300 relative shadow-md shadow-gray-900 hover:w-56'
+    <div className='Sidebar titlebar_none h-screen w-20 bg-Sidebar_dbg transition-[width] duration-300 relative shadow-md shadow-gray-900 hover:w-56'
     onMouseOver={handleMouseOver}
     onMouseOut={handleMouseOut} 
     >

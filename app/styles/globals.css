@@ -19,6 +19,14 @@ a {
   box-sizing: border-box;
 }
 
+.titlebar {
+  -webkit-app-region: drag
+}
+
+.titlebar_none {
+  -webkit-app-region: no-drag
+}
+
 /*
 @media (prefers-color-scheme: dark) {
   html {
