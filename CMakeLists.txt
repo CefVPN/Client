@@ -182,6 +182,8 @@ find_path(TAP_WINDOWS6_INCLUDE_DIRS "tap-windows.h")
 set(OPENVPN3_SRCS
     src/ovpncli.hpp
     src/ovpncli.cpp
+    src/cefvpn.hpp
+    src/cefvpn.cpp
 )
 
 set(CEFCLIENT_SRCS

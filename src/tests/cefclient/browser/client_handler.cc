@@ -9,6 +9,8 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <iostream>
+#include <thread>
 
 #include "include/base/cef_callback.h"
 #include "include/cef_browser.h"
@@ -27,6 +29,9 @@
 #include "tests/shared/common/binary_value_utils.h"
 #include "tests/shared/common/client_switches.h"
 #include "tests/shared/common/string_util.h"
+
+// ovpn includes.
+#include "cefvpn.hpp"
 
 namespace client {
 
@@ -406,6 +411,9 @@ bool ClientHandler::OnProcessMessageReceived(
 
   if(message->GetName() == "str_cr")
   {
+    std::cout << "Button Clicked!\n";
+    std::thread c(cefvpn::ovpn::connect);
+    c.detach();
     return true;
   }
 

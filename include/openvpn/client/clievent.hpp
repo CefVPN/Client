@@ -32,6 +32,7 @@
 #include <openvpn/common/size.hpp>
 #include <openvpn/common/exception.hpp>
 #include <openvpn/common/rc.hpp>
+#include <openvpn/common/arraysize.hpp>
 #include <openvpn/transport/protocol.hpp>
 
 #ifdef HAVE_JSON
