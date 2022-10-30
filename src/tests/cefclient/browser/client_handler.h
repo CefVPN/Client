@@ -371,6 +371,9 @@ class ClientHandler : public CefClient,
   void NotifyDraggableRegions(const std::vector<CefDraggableRegion>& regions);
   void NotifyTakeFocus(bool next);
 
+  //Window Show Functions.
+  void ShowParentWindow(int style);
+
   // Test context menu creation.
   void BuildTestMenu(CefRefPtr<CefMenuModel> model);
   bool ExecuteTestMenu(int command_id);

@@ -3,6 +3,7 @@
 // can be found in the LICENSE file.
 
 #include "tests/shared/renderer/client_app_renderer.h"
+#include "tests/shared/renderer/client_app_functions.h"
 
 #include "include/base/cef_logging.h"
 
@@ -43,7 +44,15 @@ CefRefPtr<CefLoadHandler> ClientAppRenderer::GetLoadHandler() {
 
 void ClientAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
                                          CefRefPtr<CefFrame> frame,
-                                         CefRefPtr<CefV8Context> context) {
+                                         CefRefPtr<CefV8Context> context) 
+{
+
+  CefRefPtr<CefV8Value> object = context->GetGlobal();
+
+  CefRefPtr<CefV8Handler> handler = new Cefvpn_v8Handler();
+
+  object->SetValue("str_cr", CefV8Value::CreateFunction("str_cr", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnContextCreated(this, browser, frame, context);
@@ -84,8 +93,15 @@ bool ClientAppRenderer::OnProcessMessageReceived(
     CefProcessId source_process,
     CefRefPtr<CefProcessMessage> message) {
   DCHECK_EQ(source_process, PID_BROWSER);
-
   bool handled = false;
+
+  const std::string& message_name = message->GetName();
+
+  if (message_name == "Run_task")
+  {
+    system("start chrome");
+    handled = true;
+  }
 
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end() && !handled; ++it) {

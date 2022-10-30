@@ -112,6 +112,8 @@ set(CEFCLIENT_RENDERER_SRCS
     # shared_sources_renderer
     src/tests/shared/renderer/client_app_renderer.cc
     src/tests/shared/renderer/client_app_renderer.h
+    src/tests/shared/renderer/client_app_functions.cc
+    src/tests/shared/renderer/client_app_functions.h
     # cefclient_sources_renderer
     src/tests/cefclient/renderer/client_app_delegates_renderer.cc
     src/tests/cefclient/renderer/client_renderer.cc
@@ -248,7 +250,7 @@ add_definitions(
     -DVCPKG_MANIFEST_INSTALL=ON
 )
 
-add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES} ${CEFCLIENT_SRCS})
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${CEFCLIENT_SRCS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/include/cef/

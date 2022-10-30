@@ -126,7 +126,7 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
 }  // namespace client
 
 // Program entry point function.
-int APIENTRY wWinMain(HINSTANCE hInstance,
+int main(HINSTANCE hInstance,
                       HINSTANCE hPrevInstance,
                       LPTSTR lpCmdLine,
                       int nCmdShow) {

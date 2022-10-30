@@ -404,6 +404,11 @@ bool ClientHandler::OnProcessMessageReceived(
     CefRefPtr<CefProcessMessage> message) {
   CEF_REQUIRE_UI_THREAD();
 
+  if(message->GetName() == "str_cr")
+  {
+    return true;
+  }
+
   const auto finish_time = bv_utils::Now();
 
   if (message_router_->OnProcessMessageReceived(browser, frame, source_process,
