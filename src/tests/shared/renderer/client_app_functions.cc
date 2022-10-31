@@ -21,6 +21,12 @@ namespace client {
             context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
 
             return true;
+        } else if(name == "dis_cr") {
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("dis_cr");
+            retval = CefV8Value::CreateString("Button Clicked!");
+
+            CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
+            context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
         }
 
     return false;

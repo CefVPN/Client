@@ -415,6 +415,10 @@ bool ClientHandler::OnProcessMessageReceived(
     std::thread c(cefvpn::ovpn::connect);
     c.detach();
     return true;
+  } else if(message->GetName() == "dis_cr") {
+    std::cout << "Button Clicked!\n";
+    std::thread d(cefvpn::ovpn::disconnect);
+    d.detach();
   }
 
   const auto finish_time = bv_utils::Now();

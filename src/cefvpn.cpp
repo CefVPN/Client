@@ -44,7 +44,7 @@ void cefvpn::ovpn::connect()
 
     OpenVPNClientHelper ovpn_helper;
 
-    mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/OP-v0iden.ovpn", true);
+    mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/OPstriker.ovpn", true);
 
     config.content = mc.profileContent;
 
