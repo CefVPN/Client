@@ -1,9 +1,10 @@
 import React from 'react'
 
-function Handler() {
-  return (
-    window.str_cr()
-  )
+export function Handler() {
+  window.str_cr();
 }
 
-export default Handler
+export function Disconnect()
+{
+  window.dis_cr();
+}
