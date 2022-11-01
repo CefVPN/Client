@@ -402,12 +402,24 @@ void ClientHandler::DetachDelegate() {
   delegate_ = nullptr;
 }
 
+bool isWindowMaximized(HWND hwnd) {
+  WINDOWPLACEMENT placement = {0};
+  placement.length = sizeof(WINDOWPLACEMENT);
+  if (GetWindowPlacement(hwnd, &placement)) {
+    return placement.showCmd == SW_SHOWMAXIMIZED;
+  }
+  return false;
+}
+
 bool ClientHandler::OnProcessMessageReceived(
     CefRefPtr<CefBrowser> browser,
     CefRefPtr<CefFrame> frame,
     CefProcessId source_process,
     CefRefPtr<CefProcessMessage> message) {
   CEF_REQUIRE_UI_THREAD();
+
+
+  CefWindowHandle hwnd = GetParent(browser->GetHost()->GetWindowHandle());
 
   if(message->GetName() == "str_cr")
   {
@@ -419,6 +431,10 @@ bool ClientHandler::OnProcessMessageReceived(
     std::cout << "Button Clicked!\n";
     std::thread d(cefvpn::ovpn::disconnect);
     d.detach();
+  } else if(message->GetName() == "min_wnd") {
+    ShowWindow(hwnd, SW_MINIMIZE);
+  } else if(message->GetName() == "max_wnd") {
+    ShowWindow(hwnd, isWindowMaximized(hwnd) ? SW_NORMAL : SW_MAXIMIZE);
   }
 
   const auto finish_time = bv_utils::Now();

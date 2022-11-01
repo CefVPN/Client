@@ -14,16 +14,24 @@ namespace client {
 
         if(name == "str_cr")
         {
-            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("str_cr");
-            retval = CefV8Value::CreateString("Button Clicked!");
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
 
             CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
             context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
 
             return true;
         } else if(name == "dis_cr") {
-            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("dis_cr");
-            retval = CefV8Value::CreateString("Button Clicked!");
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
+
+            CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
+            context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+        } else if(name == "min_wnd") {
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
+
+            CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
+            context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+        } else if(name == "max_wnd") {
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
 
             CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
             context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);

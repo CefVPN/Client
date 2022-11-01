@@ -55,6 +55,10 @@ void ClientAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
 
   object->SetValue("dis_cr", CefV8Value::CreateFunction("dis_cr", handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
+  object->SetValue("min_wnd", CefV8Value::CreateFunction("min_wnd", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+
+  object->SetValue("max_wnd", CefV8Value::CreateFunction("max_wnd", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnContextCreated(this, browser, frame, context);
