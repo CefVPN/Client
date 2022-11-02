@@ -27,6 +27,10 @@ a {
   -webkit-app-region: no-drag
 }
 
+.main_cnt {
+  zoom: reset;
+}
+
 /*
 @media (prefers-color-scheme: dark) {
   html {

@@ -494,6 +494,8 @@ LRESULT CALLBACK RootWindowWin::FindWndProc(HWND hWnd,
   return CallWindowProc(self->find_wndproc_old_, hWnd, message, wParam, lParam);
 }
 
+static bool Fullscreened = false;
+
 // static
 LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
                                             UINT message,
@@ -644,10 +646,13 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
         // of the top hit area so manually fixing that.
         if(!isWindowMaximized(hWnd))
         {
+          Fullscreened = false;
           if (point.y >= 0 && point.y <= 6 && point.x >= 5) {
             return hit = HTTOP;
           } else if(point.x <= 5 && point.y <= 6)
             return HTTOPLEFT;
+        } else {
+          Fullscreened = true;
         }
 
         if (::PtInRegion(self->draggable_region_, point.x, point.y)) {
@@ -1199,8 +1204,11 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
       POINTS points = MAKEPOINTS(lParam);
       POINT point = {points.x, points.y};
       ::ScreenToClient(hWnd, &point);
-      if(point.y >= 0 && point.y <= 6 && point.x >= 5)
-        return HTTRANSPARENT;
+      if(!Fullscreened)
+      {
+        if(point.y >= 0 && point.y <= 6 && point.x >= 5)
+          return HTTRANSPARENT;
+      }
       if (::PtInRegion(hRegion, point.x, point.y)) {
         // Let the parent window handle WM_NCHITTEST by returning HTTRANSPARENT
         // in child windows.
