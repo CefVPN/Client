@@ -315,15 +315,8 @@ bool RootWindowWin::WithExtension() const {
 }
 
 void RootWindowWin::CreateBrowserWindow(const std::string& startup_url) {
-  if (with_osr_) {
-    OsrRendererSettings settings = {};
-    MainContext::Get()->PopulateOsrSettings(&settings);
-    browser_window_.reset(
-        new BrowserWindowOsrWin(this, with_controls_, startup_url, settings));
-  } else {
-    browser_window_.reset(
-        new BrowserWindowStdWin(this, with_controls_, startup_url));
-  }
+
+    browser_window_.reset(new BrowserWindowStdWin(this, with_controls_, startup_url));
 }
 
 void RootWindowWin::CreateRootWindow(const CefBrowserSettings& settings,

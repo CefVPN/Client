@@ -34,8 +34,6 @@ set(CEFCLIENT_BROWSER_SRCS
     src/tests/cefclient/browser/client_browser.h
     src/tests/cefclient/browser/client_handler.cc
     src/tests/cefclient/browser/client_handler.h
-    src/tests/cefclient/browser/client_handler_osr.cc
-    src/tests/cefclient/browser/client_handler_osr.h
     src/tests/cefclient/browser/client_handler_std.cc
     src/tests/cefclient/browser/client_handler_std.h
     src/tests/cefclient/browser/client_types.h
@@ -49,10 +47,6 @@ set(CEFCLIENT_BROWSER_SRCS
     src/tests/cefclient/browser/main_context_impl.h
     src/tests/cefclient/browser/media_router_test.cc
     src/tests/cefclient/browser/media_router_test.h
-    src/tests/cefclient/browser/osr_dragdrop_events.h 
-    src/tests/cefclient/browser/osr_renderer.h 
-    src/tests/cefclient/browser/osr_renderer.cc 
-    src/tests/cefclient/browser/osr_renderer_settings.h 
     src/tests/cefclient/browser/preferences_test.cc
     src/tests/cefclient/browser/preferences_test.h
     src/tests/cefclient/browser/resource.h
@@ -133,32 +127,11 @@ set(CEFCLIENT_WINDOWS_SRCS
     src/tests/shared/browser/util_win.cc
     src/tests/shared/browser/util_win.h
     # cefclient_sources_win
-    src/tests/cefclient/browser/browser_window_osr_win.cc
-    src/tests/cefclient/browser/browser_window_osr_win.h
     src/tests/cefclient/browser/browser_window_std_win.cc
     src/tests/cefclient/browser/browser_window_std_win.h
     src/tests/cefclient/browser/main_context_impl_win.cc
     src/tests/cefclient/browser/main_message_loop_multithreaded_win.cc
     src/tests/cefclient/browser/main_message_loop_multithreaded_win.h
-    src/tests/cefclient/browser/osr_accessibility_helper.cc 
-    src/tests/cefclient/browser/osr_accessibility_helper.h 
-    src/tests/cefclient/browser/osr_accessibility_node.cc 
-    src/tests/cefclient/browser/osr_accessibility_node.h 
-    src/tests/cefclient/browser/osr_accessibility_node_win.cc 
-    src/tests/cefclient/browser/osr_dragdrop_win.cc 
-    src/tests/cefclient/browser/osr_dragdrop_win.h 
-    src/tests/cefclient/browser/osr_ime_handler_win.cc 
-    src/tests/cefclient/browser/osr_ime_handler_win.h 
-    src/tests/cefclient/browser/osr_d3d11_win.cc 
-    src/tests/cefclient/browser/osr_d3d11_win.h 
-    src/tests/cefclient/browser/osr_render_handler_win.cc 
-    src/tests/cefclient/browser/osr_render_handler_win.h 
-    src/tests/cefclient/browser/osr_render_handler_win_d3d11.cc 
-    src/tests/cefclient/browser/osr_render_handler_win_d3d11.h 
-    src/tests/cefclient/browser/osr_render_handler_win_gl.cc 
-    src/tests/cefclient/browser/osr_render_handler_win_gl.h 
-    src/tests/cefclient/browser/osr_window_win.cc 
-    src/tests/cefclient/browser/osr_window_win.h 
     src/tests/cefclient/browser/resource_util_win_idmap.cc
     src/tests/cefclient/browser/root_window_win.cc
     src/tests/cefclient/browser/root_window_win.h

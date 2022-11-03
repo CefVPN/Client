@@ -5,7 +5,7 @@ import Dash from './Dash'
 
 export default function Home() {
   return (
-    <div className="bg-main_dbg select-none">
+    <div className="main_cnt bg-main_dbg select-none">
       <Head>
         <title>CefVPN</title>
       </Head>
