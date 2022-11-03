@@ -11,7 +11,6 @@
 #include "include/base/cef_macros.h"
 #include "include/base/cef_ref_counted.h"
 #include "include/internal/cef_types_wrappers.h"
-#include "tests/cefclient/browser/osr_renderer_settings.h"
 
 namespace client {
 
@@ -57,7 +56,6 @@ class MainContext {
   // Populate |settings| based on command-line arguments.
   virtual void PopulateSettings(CefSettings* settings) = 0;
   virtual void PopulateBrowserSettings(CefBrowserSettings* settings) = 0;
-  virtual void PopulateOsrSettings(OsrRendererSettings* settings) = 0;
 
   // Returns the object used to create/manage RootWindow instances.
   virtual RootWindowManager* GetRootWindowManager() = 0;

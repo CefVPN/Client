@@ -35,7 +35,6 @@ class MainContextImpl : public MainContext {
   bool UseDefaultPopup() override;
   void PopulateSettings(CefSettings* settings) override;
   void PopulateBrowserSettings(CefBrowserSettings* settings) override;
-  void PopulateOsrSettings(OsrRendererSettings* settings) override;
   RootWindowManager* GetRootWindowManager() override;
 
   // Initialize CEF and associated main context state. This method must be

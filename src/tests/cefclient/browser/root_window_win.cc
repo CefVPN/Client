@@ -9,7 +9,6 @@
 #include "include/base/cef_build.h"
 #include "include/base/cef_callback.h"
 #include "include/cef_app.h"
-#include "tests/cefclient/browser/browser_window_osr_win.h"
 #include "tests/cefclient/browser/browser_window_std_win.h"
 #include "tests/cefclient/browser/main_context.h"
 #include "tests/cefclient/browser/resource.h"
@@ -316,7 +315,7 @@ bool RootWindowWin::WithExtension() const {
 
 void RootWindowWin::CreateBrowserWindow(const std::string& startup_url) {
 
-    browser_window_.reset(new BrowserWindowStdWin(this, with_controls_, startup_url));
+  browser_window_.reset(new BrowserWindowStdWin(this, with_controls_, startup_url));
 }
 
 void RootWindowWin::CreateRootWindow(const CefBrowserSettings& settings,
