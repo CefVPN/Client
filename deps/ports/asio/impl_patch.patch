@@ -1,0 +1,13 @@
+diff --git a/asio/include/asio/detail/impl/socket_ops.ipp b/asio/include/asio/detail/impl/socket_ops.ipp
+index dee39e2..75e366b 100644
+--- a/asio/include/asio/detail/impl/socket_ops.ipp
++++ b/asio/include/asio/detail/impl/socket_ops.ipp
+@@ -23,6 +23,7 @@
+ #include <cstring>
+ #include <cerrno>
+ #include <new>
++#include <malloc.h>
+ #include "asio/detail/assert.hpp"
+ #include "asio/detail/socket_ops.hpp"
+ #include "asio/error.hpp"
+ 
