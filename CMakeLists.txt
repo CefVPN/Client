@@ -4,6 +4,9 @@ project (CefVPN)
 #set(CMAKE_CXX_FLAGS_RELEASE "/MT")
 set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
+# Set CEF Version
+set(CEF_BIN_VERSION "cef_binary_106.1.1+g5891c70+chromium-106.0.5249.119")
+
 #Source Files...
 set(CEFCLIENT_BROWSER_SRCS
     # shared_sources_browser
@@ -143,9 +146,16 @@ set(CEFCLIENT_WINDOWS_SRCS
     src/tests/cefclient/resources/win/cefclient.rc
 )
 
-set(VCPKG_PATH ${PROJECT_SOURCE_DIR}/bin/vcpkg_installed/${VCPKG_TARGET_TRIPLET})
+# Cef Config
+
+set(CEF_VERSION_OS_ARCH ${CEF_BIN_VERSION}_windows64)
+set(CEF_ROOT ${PROJECT_SOURCE_DIR}/third_party/cef-project/)
+set(CEF_BIN_ROOT ${CEF_ROOT}/third_party/cef/${CEF_VERSION_OS_ARCH})
+set(CEF_LIBCEF_DLL_LIB ${CEF_ROOT}/build/libcef_dll_wrapper)
 
 #VCPKG
+set(VCPKG_PATH ${PROJECT_SOURCE_DIR}/bin/vcpkg_installed/${VCPKG_TARGET_TRIPLET})
+
 find_package(asio CONFIG REQUIRED)
 find_package(lz4 CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
@@ -217,6 +227,10 @@ set(OPENVPN3_DEP_LIBS
     Fwpuclnt.lib
 )
 
+set(CEF_DEP_LIBS
+
+)
+
 add_definitions(
     -DCMAKE_INTDIR="Debug"
     ${WINDOWS_DEFS}
@@ -236,9 +250,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    ${PROJECT_SOURCE_DIR}/lib/libcef.lib
-    ${PROJECT_SOURCE_DIR}/lib/libcef_dll_wrapper.lib
-    ${PROJECT_SOURCE_DIR}/lib/cef_sandbox.lib
+    ${CEF_BIN_ROOT}/Debug/libcef.lib
+    ${CEF_LIBCEF_DLL_LIB}/Debug/libcef_dll_wrapper.lib
+    ${CEF_BIN_ROOT}/Debug/cef_sandbox.lib
     Ws2_32.lib
     Dbghelp.lib
     Shlwapi.lib
