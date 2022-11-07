@@ -2,12 +2,12 @@
 <div align=center>
   <img src=https://user-images.githubusercontent.com/76495154/200121487-b5ae885f-2afd-42a1-acb6-31b5708c9343.png>
 
-# CefVPN
+# CefVPN Client
 **A Chromium Embeded Framework Based VPN.**
 </div>
 
 ## Cef/VPN?
-**CefVPN, is an Application that uses [CEF](https://bitbucket.org/chromiumembedded/cef/) and [OpenVPN3](https://github.com/OpenVPN/openvpn3) to provide a userfriendly and secure Connection to Protect Your Self-online. Unlike the official OpenVPN Connect Client CefVPN is completely Open Source with a more Advaced UI. Best of all its the Only VPN that will have bultin themeing support.**
+**CefVPN Client, is an Application that uses [CEF](https://bitbucket.org/chromiumembedded/cef/) and [OpenVPN3](https://github.com/OpenVPN/openvpn3) to provide a userfriendly and secure Connection to Protect Your Self-online. Unlike the official OpenVPN Connect Client CefVPN is completely Open Source with a more Advaced UI. Best of all its the Only VPN that will have bultin themeing support.**
 
 ## Supported Platforms (ATM)
 
