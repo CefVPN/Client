@@ -7,6 +7,11 @@ set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 # Set CEF Version
 set(CEF_BIN_VERSION "cef_binary_106.1.1+g5891c70+chromium-106.0.5249.119")
 
+# Cmake Modules.
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CEF_ROOT ${PROJECT_SOURCE_DIR})
+include("FindCEF")
+
 #Source Files...
 set(CEFCLIENT_BROWSER_SRCS
     # shared_sources_browser
@@ -286,14 +291,15 @@ target_include_directories(
     ${TAP_WINDOWS6_INCLUDE_DIRS}
 )
 
-add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND "mt.exe" -nologo
-            -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.exe.manifest\" \"${CMAKE_CURRENT_SOURCE_DIR}/compatibility.manifest\"
-            -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/bin/Debug/${PROJECT_NAME}.exe"\;\#1
-    COMMENT "Adding manifest..."
-)
-
-
-
+if(OS_WINDOWS)
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND "mt.exe" -nologo
+                -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.exe.manifest\" \"${CMAKE_CURRENT_SOURCE_DIR}/compatibility.manifest\"
+                -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/bin/Debug/${PROJECT_NAME}.exe"\;\#1
+        COMMENT "Adding manifest..."
+    )
+    COPY_FILES("${PROJECT_NAME}" "${CEF_BINARY_FILES}" "${CEF_BIN_ROOT}/Debug" "${PROJECT_SOURCE_DIR}/bin/Debug")
+    COPY_FILES("${PROJECT_NAME}" "${CEF_RESOURCE_FILES}" "${CEF_BIN_ROOT}/Resources" "${PROJECT_SOURCE_DIR}/bin/Debug")
+endif()
