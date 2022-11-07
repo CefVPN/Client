@@ -99,15 +99,8 @@ bool ClientAppRenderer::OnProcessMessageReceived(
     CefProcessId source_process,
     CefRefPtr<CefProcessMessage> message) {
   DCHECK_EQ(source_process, PID_BROWSER);
+
   bool handled = false;
-
-  const std::string& message_name = message->GetName();
-
-  if (message_name == "Run_task")
-  {
-    system("start chrome");
-    handled = true;
-  }
 
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end() && !handled; ++it) {

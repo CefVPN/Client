@@ -6,3 +6,5 @@ GPUCache/
 app/node_modules/
 package-lock.json
 vcpkg_installed/
+Backup/
+*.log

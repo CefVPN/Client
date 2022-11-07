@@ -87,9 +87,7 @@ void ClientAppBrowser::OnBeforeCommandLineProcessing(
   }
 }
 
-
 void ClientAppBrowser::OnContextInitialized() {
-  //CefRegisterSchemeHandlerFactory("client", “myapp”, new MySchemeHandlerFactory());
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnContextInitialized(this);

@@ -161,13 +161,11 @@ class ClientHandler : public CefClient,
                           const std::vector<CefString>& icon_urls) override;
   void OnFullscreenModeChange(CefRefPtr<CefBrowser> browser,
                               bool fullscreen) override;
-  /*
   bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
                         cef_log_severity_t level,
                         const CefString& message,
                         const CefString& source,
                         int line) override;
-  */
   bool OnAutoResize(CefRefPtr<CefBrowser> browser,
                     const CefSize& new_size) override;
   bool OnCursorChange(CefRefPtr<CefBrowser> browser,
@@ -370,9 +368,6 @@ class ClientHandler : public CefClient,
   void NotifyLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
   void NotifyDraggableRegions(const std::vector<CefDraggableRegion>& regions);
   void NotifyTakeFocus(bool next);
-
-  //Window Show Functions.
-  void ShowParentWindow(int style);
 
   // Test context menu creation.
   void BuildTestMenu(CefRefPtr<CefMenuModel> model);

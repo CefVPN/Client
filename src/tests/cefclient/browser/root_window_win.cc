@@ -75,9 +75,9 @@ bool IsProcessPerMonitorDpiAware() {
   return per_monitor_dpi_aware == PerMonitorDpiAware::PER_MONITOR_DPI_AWARE;
 }
 
+// DPI value for 1x scale factor.
 #define DPI_1X 96.0f
 
-// DPI value for 1x scale factor.
 float GetWindowScaleFactor(HWND hwnd) {
   if (hwnd && IsProcessPerMonitorDpiAware()) {
     typedef UINT(WINAPI * GetDpiForWindowPtr)(HWND);
@@ -314,7 +314,6 @@ bool RootWindowWin::WithExtension() const {
 }
 
 void RootWindowWin::CreateBrowserWindow(const std::string& startup_url) {
-
   browser_window_.reset(new BrowserWindowStdWin(this, with_controls_, startup_url));
 }
 
@@ -633,7 +632,6 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
         POINTS points = MAKEPOINTS(lParam);
         POINT point = {points.x, points.y};
         ::ScreenToClient(hWnd, &point);
-
         // Looks like adjustment happening in NCCALCSIZE is messing with the detection
         // of the top hit area so manually fixing that.
         if(!isWindowMaximized(hWnd))
@@ -646,7 +644,6 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
         } else {
           Fullscreened = true;
         }
-
         if (::PtInRegion(self->draggable_region_, point.x, point.y)) {
           // If cursor is inside a draggable region return HTCAPTION to allow
           // dragging.
@@ -674,13 +671,13 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
           NULL,
           rcClient.left, rcClient.top,
           rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
-          SWP_FRAMECHANGED);
-
+          SWP_FRAMECHANGED
+        );
       self->OnCreate(reinterpret_cast<CREATESTRUCT*>(lParam));
+      
       return 0; 
       break;
     }
-
 
     case WM_NCDESTROY:
       // Clear the reference to |self|.
@@ -1209,6 +1206,7 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
     }
     return hit;
   }
+
 
   return CallWindowProc(hParentWndProc, hWnd, message, wParam, lParam);
 }
