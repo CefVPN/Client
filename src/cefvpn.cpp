@@ -2,43 +2,45 @@
 #include <iostream>
 
 #include <openvpn/client/clievent.hpp>
+#include <openvpn/time/timestr.hpp>
 
 using namespace openvpn;
 
 class Client : public ClientAPI::OpenVPNClient
 {
 private:
-
-    virtual void event(const ClientAPI::Event& ev) override {
-
+    virtual void event(const ClientAPI::Event &ev) override
+    {
     }
 
-    virtual void log(const ClientAPI::LogInfo& info) override {
-        std::cout << info.text;
+    virtual void log(const ClientAPI::LogInfo &info) override
+    {
+        std::cout << "[" << date_time() << "] " << info.text << std::flush;
     }
 
-    virtual void external_pki_cert_request(ClientAPI::ExternalPKICertRequest& certreq) override {
-
+    virtual void external_pki_cert_request(ClientAPI::ExternalPKICertRequest &certreq) override
+    {
     }
 
-    virtual void external_pki_sign_request(ClientAPI::ExternalPKISignRequest& signcert) override {
-
+    virtual void external_pki_sign_request(ClientAPI::ExternalPKISignRequest &signcert) override
+    {
     }
 
-    virtual bool pause_on_connection_timeout() override {
+    virtual bool pause_on_connection_timeout() override
+    {
         return false;
     }
-
 };
 
-static Client* the_client = nullptr;
-
+static Client *the_client = nullptr;
 
 void cefvpn::ovpn::connect()
 {
     using namespace openvpn::ClientAPI;
 
     ClientAPI::Config config;
+    config.allowLocalDnsResolvers = true;
+    config.allowLocalLanAccess = true;
 
     MergeConfig mc;
 

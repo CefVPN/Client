@@ -1,5 +1,5 @@
 import React from 'react'
-import { Close_WND, Min_WND, Max_WND } from './Handler'
+import { Close_WND, Min_WND, Max_WND, isFullscreen } from './Handler'
 
 function Titlebar() {
   return (
