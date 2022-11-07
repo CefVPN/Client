@@ -13,6 +13,7 @@
 #include <thread>
 
 #include "include/base/cef_callback.h"
+#include "include/internal/cef_time.h"
 #include "include/cef_browser.h"
 #include "include/cef_command_ids.h"
 #include "include/cef_frame.h"
@@ -81,6 +82,15 @@ std::string GetTimeString(const CefTime& value) {
      << std::setfill('0') << std::setw(2) << value.minute << ":"
      << std::setfill('0') << std::setw(2) << value.second;
   return ss.str();
+}
+
+std::string GetTimeString(const CefBaseTime& value) {
+  CefTime time;
+  if (cef_time_from_basetime(value, &time)) {
+    return GetTimeString(time);
+  } else {
+    return "Invalid";
+  }
 }
 
 std::string GetBinaryString(CefRefPtr<CefBinaryValue> value) {
@@ -605,7 +615,7 @@ void ClientHandler::OnFullscreenModeChange(CefRefPtr<CefBrowser> browser,
 
   NotifyFullscreen(fullscreen);
 }
-/*
+
 bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
                                      cef_log_severity_t level,
                                      const CefString& message,
@@ -649,7 +659,6 @@ bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 
   return false;
 }
-*/
 
 bool ClientHandler::OnAutoResize(CefRefPtr<CefBrowser> browser,
                                  const CefSize& new_size) {
