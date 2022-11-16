@@ -486,6 +486,53 @@ LRESULT CALLBACK RootWindowWin::FindWndProc(HWND hWnd,
 }
 
 static bool Fullscreened = false;
+  LRESULT DecodeGesture(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    // Create a structure to populate and retrieve the extra message info.
+  GESTUREINFO gi;  
+    
+  ZeroMemory(&gi, sizeof(GESTUREINFO));
+    
+  gi.cbSize = sizeof(GESTUREINFO);
+
+  BOOL bResult  = GetGestureInfo((HGESTUREINFO)lParam, &gi);
+  BOOL bHandled = FALSE;
+
+  if(bResult) {
+      // now interpret the gesture
+      switch (gi.dwID){
+         case GID_ZOOM:
+             // Code for zooming goes here  
+             system("start chrome");
+             bHandled = TRUE;
+             break;
+         case GID_PAN:
+             // Code for panning goes here
+             bHandled = TRUE;
+             break;
+         case GID_ROTATE:
+             // Code for rotation goes here
+             bHandled = TRUE;
+             break;
+         case GID_TWOFINGERTAP:
+             // Code for two-finger tap goes here
+             bHandled = TRUE;
+             break;
+         case GID_PRESSANDTAP:
+             // Code for roll over goes here
+             bHandled = TRUE;
+             break;
+         default:
+             // A gesture was not recognized
+             break;
+      }
+  }else{
+      DWORD dwErr = GetLastError();
+      if (dwErr > 0){
+          MessageBoxW(hWnd, L"Error!", L"Could not retrieve a GESTUREINFO structure.", MB_OK);
+      }
+  }
+  return 0;
+}
 
 // static
 LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
@@ -662,7 +709,12 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       self->hwnd_ = hWnd;
 
       self->OnNCCreate(cs);
-    } break;
+      break;
+    } 
+
+    case WM_GESTURE: {
+      return DecodeGesture(hWnd, message, wParam, lParam);
+    }
 
     case WM_CREATE: {
       RECT rcClient;
@@ -1187,6 +1239,11 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
       reinterpret_cast<WNDPROC>(::GetPropW(hWnd, kParentWndProc));
   HRGN hRegion = reinterpret_cast<HRGN>(::GetPropW(hWnd, kDraggableRegion));
 
+  if(message == WM_GESTURE)
+  {
+    return DecodeGesture(hWnd, message, wParam, lParam);
+  }
+
   if (message == WM_NCHITTEST) {
     LRESULT hit = CallWindowProc(hParentWndProc, hWnd, message, wParam, lParam);
     if (hit == HTCLIENT) {
@@ -1206,8 +1263,7 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
     }
     return hit;
   }
-
-
+  
   return CallWindowProc(hParentWndProc, hWnd, message, wParam, lParam);
 }
 
