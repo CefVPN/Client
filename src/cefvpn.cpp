@@ -39,8 +39,7 @@ void cefvpn::ovpn::connect()
     using namespace openvpn::ClientAPI;
 
     ClientAPI::Config config;
-    config.allowLocalDnsResolvers = true;
-    config.allowLocalLanAccess = true;
+    config.allowLocalDnsResolvers = false;
 
     MergeConfig mc;
 
@@ -49,6 +48,7 @@ void cefvpn::ovpn::connect()
     mc = ovpn_helper.merge_config("C:/Users/OPstriker/Desktop/OP-v0iden.ovpn", true);
 
     config.content = mc.profileContent;
+    config.dco = true;
 
     Client client;
 

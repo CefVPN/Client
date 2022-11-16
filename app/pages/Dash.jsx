@@ -47,11 +47,11 @@ export default function Dash() {
             }
           }}>
             <h1 className="text-lg pt-5 pl-5 opacity-75">Virtual Location</h1>
-            <ComposableMap className='pr-5 pt-12'>
+            <ComposableMap className="flex">
               <Geographies geography={"/features.json"}>
               {({ geographies }) =>
                 geographies.map((geo) => (
-                  <Geography key={geo.rsmKey} geography={geo} fill="#4f525c" stroke='none' />
+                  <Geography key={geo.rsmKey} geography={geo} fill="#4f525c" stroke='#4f525c' pointerEvents={"none"} />
                 ))
               }
               </Geographies>
