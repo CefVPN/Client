@@ -1,7 +1,15 @@
 import { React, useState, useEffect } from 'react'
+import { useRouter } from 'next/router';
 import { Button, Box } from '@mui/material'
 import { Handler, Disconnect, isFullscreen } from '../components/Handler'
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
+
+function SomePage(props) {
+
+}
+export async function getServerSideProps(context) {
+  // Database logic here
+}
 
 async function getIPLocation() {
   const response = await fetch('https://ipinfo.io/?token=a416934c6bf2af');
@@ -17,19 +25,34 @@ async function getIPLocation() {
   return posobj;
 }
 
-export default function Dash() {
+function GetLocMarker()
+{
+  var checked = false;
+  const router = useRouter();
+  // Call this function whenever you want to
+  // refresh props!
+  const refreshData = () => {
+    router.replace(router.asPath);
+  }
   const [position, setPosition] = useState({ x:0, y:0 });
-  let xpos;
-  let ypos;
   getIPLocation().then(iploc => {
-    xpos = iploc.lat;
-    ypos = iploc.long;
-    console.log(xpos, ypos);
+    position.x = iploc.lat;
+    position.y = iploc.long;
+    if(!checked)
+    {
+      refreshData();
+      checked = true;
+    }
+    console.log(position.x, position.y);
   })
-  useEffect(() => {
-    position.x = xpos;
-    position.y = ypos;
-  })
+  return (
+    <Marker coordinates={[position.y, position.x]}> 
+      <circle r={8} fill="#F53" opacity={1} />
+    </Marker>
+  )
+}
+
+export default function Dash() {
   return (
     <div className="text-white absolute ml-20">
         <div className="main ml-9 mt-8">
@@ -55,9 +78,7 @@ export default function Dash() {
                 ))
               }
               </Geographies>
-              <Marker coordinates={[position.y, position.x]}> 
-                <circle r={8} fill="#F53" opacity={0} />
-              </Marker>
+                <GetLocMarker />
             </ComposableMap>
           </Box>
             <Button variant='outlined' onClick={Handler} className="mt-20">Connect</Button>
