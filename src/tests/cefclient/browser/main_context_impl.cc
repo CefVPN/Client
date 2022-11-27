@@ -16,7 +16,7 @@ namespace client {
 namespace {
 
 // The default URL to load in a browser window.
-const char kDefaultUrl[] = "http://localhost:3000";
+const char kDefaultUrl[] = "cefvpn://client/index";
 
 // Returns the ARGB value for |color|.
 cef_color_t ParseColor(const std::string& color) {

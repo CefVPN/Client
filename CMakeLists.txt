@@ -5,7 +5,7 @@ project (CefVPN)
 set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 # Set CEF Version
-set(CEF_BIN_VERSION "cef_binary_106.1.1+g5891c70+chromium-106.0.5249.119")
+set(CEF_BIN_VERSION "cef_binary_107.1.11+g26c0b5e+chromium-107.0.5304.110")
 
 # Cmake Modules.
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -223,6 +223,7 @@ set(WINDOWS_DEFS
 set(CEF_DEFS
     -DCEF_USE_SANDBOX
     -DCEF_USE_ATL   
+    -DOS_POSIX
 )
 
 set(OPENVPN3_DEP_LIBS
@@ -245,7 +246,7 @@ add_definitions(
     -DVCPKG_MANIFEST_INSTALL=ON
 )
 
-add_executable(${PROJECT_NAME} ${SRC_FILES} ${CEFCLIENT_SRCS})
+add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES} ${CEFCLIENT_SRCS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/include/cef/
@@ -272,6 +273,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     Oleacc.lib
     Imm32.lib
     D3D11.lib
+    Shell32.lib
+    Dwmapi.lib
     ${OPENVPN3_DEP_LIBS}
 )
 

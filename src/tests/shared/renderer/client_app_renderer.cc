@@ -59,6 +59,8 @@ void ClientAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
 
   object->SetValue("max_wnd", CefV8Value::CreateFunction("max_wnd", handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
+  object->SetValue("hide_wnd", CefV8Value::CreateFunction("hide_wnd", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnContextCreated(this, browser, frame, context);

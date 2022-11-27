@@ -93,4 +93,15 @@ void BrowserWindow::OnSetDraggableRegions(
   delegate_->OnSetDraggableRegions(regions);
 }
 
+void BrowserWindow::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
+  CEF_REQUIRE_UI_THREAD();
+  delegate_->OnBeforeContextMenu(model);
+}
+
+bool BrowserWindow::RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) {
+  REQUIRE_MAIN_THREAD();
+  delegate_->RunContextMenu(callback);
+  return false;
+}
+
 }  // namespace client

@@ -19,9 +19,14 @@
 #include "tests/shared/browser/util_win.h"
 #include "tests/shared/common/client_switches.h"
 
+#include <shellapi.h>
+#include <dwmapi.h>
+
 #define MAX_URL_LENGTH 255
 #define BUTTON_WIDTH 72
 #define URLBAR_HEIGHT 24
+
+
 
 namespace client {
 
@@ -373,6 +378,9 @@ void RootWindowWin::CreateRootWindow(const CefBrowserSettings& settings,
                  x, y, 1300, 800, nullptr, nullptr, hInstance, this);
   CHECK(hwnd_);
 
+    BOOL value = TRUE;
+    DwmSetWindowAttribute(hwnd_, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
+
   if (!called_enable_non_client_dpi_scaling_ && IsProcessPerMonitorDpiAware()) {
     // This call gets Windows to scale the non-client area when WM_DPICHANGED
     // is fired on Windows versions < 10.0.14393.0.
@@ -534,12 +542,30 @@ static bool Fullscreened = false;
   return 0;
 }
 
+// System Tray Icon
+NOTIFYICONDATA nid = {};
+#define WM_CEFVPN (WM_USER + 1)
+#define ID_DISPLAY_APP_LYCF 103
+#define ID_LYCF_CLOSE 104
+bool NotifyCon = true;
+
 // static
 LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
                                             UINT message,
                                             WPARAM wParam,
-                                            LPARAM lParam) {
+                                            LPARAM lParam) {   
   REQUIRE_MAIN_THREAD();
+
+  nid.cbSize = sizeof(nid);
+  nid.hWnd = hWnd;
+  nid.uID = 100;
+  nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+  nid.uCallbackMessage = WM_CEFVPN;
+  wcscpy_s(nid.szTip, L"CefVPN");
+  nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+
+  if(NotifyCon)
+    Shell_NotifyIcon(NIM_ADD, &nid);
 
   RootWindowWin* self = nullptr;
   if (message != WM_NCCREATE) {
@@ -664,6 +690,8 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       break;
 
     case WM_CLOSE:
+      NotifyCon = false;
+      Shell_NotifyIcon(NIM_DELETE, &nid);
       if (self->OnClose())
         return 0;  // Cancel the close.
       break;
@@ -699,7 +727,55 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       }
       return hit;
     }
+    case WM_CEFVPN: {
+      switch (lParam)
+      {
+      case WM_LBUTTONUP:{
+        ShowWindow(hWnd, SW_RESTORE);
+        SetForegroundWindow(hWnd);
+        break;
+      }
+      case WM_RBUTTONUP: {
+        // Show Context Menue
 
+          POINT ps_tl;
+          GetCursorPos(&ps_tl);
+
+          HMENU ToolTipMenu = CreatePopupMenu();
+
+          BOOL wndState = IsWindowVisible(hWnd);
+
+          AppendMenu(ToolTipMenu, MF_STRING, ID_DISPLAY_APP_LYCF, wndState ? L"Hide CefVPN" : L"Launch CefVPN");
+          AppendMenu(ToolTipMenu, MF_SEPARATOR, 0, NULL);
+          AppendMenu(ToolTipMenu, MF_STRING, ID_LYCF_CLOSE, L"Quit");
+
+          SetForegroundWindow(hWnd);
+
+          int id = TrackPopupMenu(ToolTipMenu, TPM_RIGHTBUTTON | TPM_LEFTBUTTON | TPM_RETURNCMD, ps_tl.x, ps_tl.y, 0, hWnd, NULL);
+
+          switch (id) {
+            case ID_DISPLAY_APP_LYCF: {
+              ShowWindow(hWnd, wndState ? SW_HIDE : SW_RESTORE);
+              break; 
+            }
+            case ID_LYCF_CLOSE: {
+              NotifyCon = false;
+              Shell_NotifyIcon(NIM_DELETE, &nid);
+              PostMessage(hWnd, WM_CLOSE, 0, 0);
+              break;
+            }
+          }
+
+          PostMessage(hWnd, WM_NULL, 0, 0);
+
+        break;
+      }
+      default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+        break;
+      }
+      break;
+    }
     case WM_NCCREATE: {
       CREATESTRUCT* cs = reinterpret_cast<CREATESTRUCT*>(lParam);
       self = reinterpret_cast<RootWindowWin*>(cs->lpCreateParams);
@@ -1107,6 +1183,13 @@ void RootWindowWin::OnDestroyed() {
   NotifyDestroyedIfDone();
 }
 
+void RootWindowWin::ShowContextMenu() {
+  CefRefPtr<CefRunContextMenuCallback> callback;
+  RunContextMenu(callback);
+}
+
+
+
 void RootWindowWin::OnBrowserCreated(CefRefPtr<CefBrowser> browser) {
   REQUIRE_MAIN_THREAD();
 
@@ -1355,6 +1438,17 @@ void RootWindowWin::NotifyDestroyedIfDone() {
   // Notify once both the window and the browser have been destroyed.
   if (window_destroyed_ && browser_destroyed_)
     delegate_->OnRootWindowDestroyed(this);
+}
+
+void RootWindowWin::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
+  model->AddItem(0, "Hellow World");
+}
+
+bool RootWindowWin::RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) {
+  CEF_REQUIRE_UI_THREAD();
+  callback->Cancel();
+
+  return true;
 }
 
 }  // namespace client

@@ -11,7 +11,7 @@ export function Disconnect()
 
 export function Close_WND()
 {
-  window.close();
+  window.hide_wnd();
 }
 
 export function Min_WND()

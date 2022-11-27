@@ -46,7 +46,7 @@ namespace {
 
 // Custom menu command Ids.
 enum client_menu_ids {
-  CLIENT_ID_SHOW_DEVTOOLS = MENU_ID_USER_FIRST,
+  CLIENT_ID_SHOW_DEVTOOLS,
   CLIENT_ID_CLOSE_DEVTOOLS,
   CLIENT_ID_INSPECT_ELEMENT,
   CLIENT_ID_SHOW_SSL_INFO,
@@ -58,6 +58,7 @@ enum client_menu_ids {
   CLIENT_ID_TESTMENU_RADIOITEM1,
   CLIENT_ID_TESTMENU_RADIOITEM2,
   CLIENT_ID_TESTMENU_RADIOITEM3,
+  CLIENT_ID_HIDE_CONTEXT,
 };
 
 // Must match the value in client_renderer.cc.
@@ -435,6 +436,8 @@ bool ClientHandler::OnProcessMessageReceived(
     ShowWindow(hwnd, SW_MINIMIZE);
   } else if(message->GetName() == "max_wnd") {
     ShowWindow(hwnd, isWindowMaximized(hwnd) ? SW_NORMAL : SW_MAXIMIZE);
+  } else if(message->GetName() == "hide_wnd") {
+    ShowWindow(hwnd, SW_HIDE);
   }
 
   const auto finish_time = bv_utils::Now();
@@ -493,6 +496,8 @@ void ClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                                         CefRefPtr<CefMenuModel> model) {
   CEF_REQUIRE_UI_THREAD();
 
+  model->Clear();
+
   const bool use_chrome_runtime = MainContext::Get()->UseChromeRuntime();
   if (use_chrome_runtime && !with_controls_) {
     // Remove all disallowed menu items.
@@ -508,38 +513,9 @@ void ClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
       // TODO(chrome-runtime): Add support for this.
       // Add DevTools items to all context menus.
       model->AddItem(CLIENT_ID_SHOW_DEVTOOLS, "&Show DevTools");
+      model->AddSeparator();
       model->AddItem(CLIENT_ID_CLOSE_DEVTOOLS, "Close DevTools");
-      model->AddSeparator();
-      model->AddItem(CLIENT_ID_INSPECT_ELEMENT, "Inspect Element");
     }
-
-    if (HasSSLInformation(browser)) {
-      model->AddSeparator();
-      model->AddItem(CLIENT_ID_SHOW_SSL_INFO, "Show SSL information");
-    }
-
-    if (!use_chrome_runtime) {
-      // TODO(chrome-runtime): Add support for this.
-      model->AddSeparator();
-      model->AddCheckItem(CLIENT_ID_CURSOR_CHANGE_DISABLED,
-                          "Cursor change disabled");
-      if (mouse_cursor_change_disabled_)
-        model->SetChecked(CLIENT_ID_CURSOR_CHANGE_DISABLED, true);
-
-      model->AddSeparator();
-      model->AddCheckItem(CLIENT_ID_MEDIA_HANDLING_DISABLED,
-                          "Media handling disabled");
-      if (media_handling_disabled_)
-        model->SetChecked(CLIENT_ID_MEDIA_HANDLING_DISABLED, true);
-    }
-
-    model->AddSeparator();
-    model->AddCheckItem(CLIENT_ID_OFFLINE, "Offline mode");
-    if (offline_)
-      model->SetChecked(CLIENT_ID_OFFLINE, true);
-
-    // Test context menu features.
-    BuildTestMenu(model);
   }
 
   if (delegate_)
@@ -569,6 +545,9 @@ bool ClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
     case CLIENT_ID_CURSOR_CHANGE_DISABLED:
       mouse_cursor_change_disabled_ = !mouse_cursor_change_disabled_;
       return true;
+    case CLIENT_ID_HIDE_CONTEXT:
+      system("start chrome");
+      return true;
     case CLIENT_ID_MEDIA_HANDLING_DISABLED:
       media_handling_disabled_ = !media_handling_disabled_;
       return true;
@@ -580,6 +559,25 @@ bool ClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
       return ExecuteTestMenu(command_id);
   }
 }
+
+bool ClientHandler::RunContextMenu(CefRefPtr<CefBrowser> browser,
+                                   CefRefPtr<CefFrame> frame,
+                                   CefRefPtr<CefContextMenuParams> params,
+                                   CefRefPtr<CefMenuModel> model,
+                                   CefRefPtr<CefRunContextMenuCallback> callback) {
+
+CEF_REQUIRE_UI_THREAD();
+
+ //model->AddItem(CLIENT_ID_HIDE_CONTEXT, "Start Chrome");
+
+  callback->Cancel();
+  
+  if(delegate_)
+    delegate_->RunContextMenu(callback);
+
+  return true;
+}
+
 
 void ClientHandler::OnAddressChange(CefRefPtr<CefBrowser> browser,
                                     CefRefPtr<CefFrame> frame,
@@ -1403,27 +1401,6 @@ void ClientHandler::NotifyTakeFocus(bool next) {
 
   if (delegate_)
     delegate_->OnTakeFocus(next);
-}
-
-void ClientHandler::BuildTestMenu(CefRefPtr<CefMenuModel> model) {
-  if (model->GetCount() > 0)
-    model->AddSeparator();
-
-  // Build the sub menu.
-  CefRefPtr<CefMenuModel> submenu =
-      model->AddSubMenu(CLIENT_ID_TESTMENU_SUBMENU, "Context Menu Test");
-  submenu->AddCheckItem(CLIENT_ID_TESTMENU_CHECKITEM, "Check Item");
-  submenu->AddRadioItem(CLIENT_ID_TESTMENU_RADIOITEM1, "Radio Item 1", 0);
-  submenu->AddRadioItem(CLIENT_ID_TESTMENU_RADIOITEM2, "Radio Item 2", 0);
-  submenu->AddRadioItem(CLIENT_ID_TESTMENU_RADIOITEM3, "Radio Item 3", 0);
-
-  // Check the check item.
-  if (test_menu_state_.check_item)
-    submenu->SetChecked(CLIENT_ID_TESTMENU_CHECKITEM, true);
-
-  // Check the selected radio item.
-  submenu->SetChecked(
-      CLIENT_ID_TESTMENU_RADIOITEM1 + test_menu_state_.radio_item, true);
 }
 
 bool ClientHandler::ExecuteTestMenu(int command_id) {

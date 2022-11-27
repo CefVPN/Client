@@ -53,6 +53,10 @@ class BrowserWindow : public ClientHandler::Delegate {
     virtual void OnSetDraggableRegions(
         const std::vector<CefDraggableRegion>& regions) = 0;
 
+    virtual void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {}
+
+    virtual bool RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) = 0;
+
    protected:
     virtual ~Delegate() {}
   };
@@ -131,6 +135,10 @@ class BrowserWindow : public ClientHandler::Delegate {
                          bool canGoForward) override;
   void OnSetDraggableRegions(
       const std::vector<CefDraggableRegion>& regions) override;
+
+  void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) override;
+
+  bool RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) override;
 
   Delegate* delegate_;
   CefRefPtr<CefBrowser> browser_;

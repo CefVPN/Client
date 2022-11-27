@@ -36,9 +36,9 @@ namespace test_runner {
 
 namespace {
 
-const char kTestHost[] = "tests";
+const char kTestHost[] = "cefvpn";
 const char kLocalHost[] = "localhost";
-const char kTestOrigin[] = "http://tests/";
+const char kTestOrigin[] = "cefvpn://client/";
 
 // Pages handled via StringResourceProvider.
 const char kTestGetSourcePage[] = "get_source.html";
@@ -763,10 +763,10 @@ void SetupResourceManager(CefRefPtr<CefResourceManager> resource_manager,
   resource_manager->AddProvider(
       CreateBinaryResourceProvider(test_origin, std::string()), 100,
       std::string());
-#elif defined(OS_POSIX)
+
   // Read resources from a directory on disk.
-  std::string resource_dir;
-  if (GetResourceDir(resource_dir)) {
+  std::string resource_dir = "C:\\Users\\skill\\Dev\\CefVPN\\app\\out";
+  if (!resource_dir.empty()) {
     resource_manager->AddDirectoryProvider(test_origin, resource_dir, 100,
                                            std::string());
   }

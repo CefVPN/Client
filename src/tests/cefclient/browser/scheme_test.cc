@@ -39,33 +39,8 @@ class ClientSchemeHandler : public CefResourceHandler {
     bool handled = false;
 
     std::string url = request->GetURL();
-    if (strstr(url.c_str(), "handler.html") != nullptr) {
-      // Build the response html
-      data_ =
-          "<html><head><title>Client Scheme Handler</title></head>"
-          "<body bgcolor=\"white\">"
-          "This contents of this page page are served by the "
-          "ClientSchemeHandler class handling the client:// protocol."
-          "<br/>You should see an image:"
-          "<br/><img src=\"client://tests/logo.png\"><pre>";
 
-      // Output a string representation of the request
-      const std::string& dump = test_runner::DumpRequestContents(request);
-      data_.append(dump);
-
-      data_.append(
-          "</pre><br/>Try the test form:"
-          "<form method=\"POST\" action=\"handler.html\">"
-          "<input type=\"text\" name=\"field1\">"
-          "<input type=\"text\" name=\"field2\">"
-          "<input type=\"submit\">"
-          "</form></body></html>");
-
-      handled = true;
-
-      // Set the resulting mime type
-      mime_type_ = "text/html";
-    } else if (strstr(url.c_str(), "logo.png") != nullptr) {
+    if (strstr(url.c_str(), "logo.png") != nullptr) {
       // Load the response image
       if (LoadBinaryResource("logo.png", data_)) {
         handled = true;
@@ -146,8 +121,7 @@ class ClientSchemeHandlerFactory : public CefSchemeHandlerFactory {
 }  // namespace
 
 void RegisterSchemeHandlers() {
-  CefRegisterSchemeHandlerFactory("client", "tests",
-                                  new ClientSchemeHandlerFactory());
+  CefRegisterSchemeHandlerFactory("cefvpn", "client", new ClientSchemeHandlerFactory());
 }
 
 }  // namespace scheme_test

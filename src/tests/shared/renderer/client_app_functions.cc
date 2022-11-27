@@ -35,6 +35,11 @@ namespace client {
 
             CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
             context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+        } else if(name == "hide_wnd") {
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
+
+            CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
+            context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
         }
 
     return false;

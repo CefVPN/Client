@@ -109,6 +109,10 @@ void BrowserWindowStdWin::SetFocus(bool focus) {
     browser_->GetHost()->SetFocus(focus);
 }
 
+bool BrowserWindowStdWin::RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) {
+  return false;
+}
+
 ClientWindowHandle BrowserWindowStdWin::GetWindowHandle() const {
   REQUIRE_MAIN_THREAD();
 

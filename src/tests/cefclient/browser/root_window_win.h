@@ -93,6 +93,7 @@ class RootWindowWin : public RootWindow, public BrowserWindow::Delegate {
   void OnCreate(LPCREATESTRUCT lpCreateStruct);
   bool OnClose();
   void OnDestroyed();
+  void ShowContextMenu();
 
   // BrowserWindow::Delegate methods.
   void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
@@ -106,7 +107,8 @@ class RootWindowWin : public RootWindow, public BrowserWindow::Delegate {
                          bool canGoForward) override;
   void OnSetDraggableRegions(
       const std::vector<CefDraggableRegion>& regions) override;
-
+  void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) override;
+  bool RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) override;
   void NotifyDestroyedIfDone();
 
   // After initialization all members are only accessed on the main thread.

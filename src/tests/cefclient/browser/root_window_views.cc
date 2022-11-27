@@ -463,6 +463,10 @@ void RootWindowViews::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
     window_->OnBeforeContextMenu(model);
 }
 
+bool RootWindowViews::RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) {
+  return false;
+}
+
 void RootWindowViews::CreateClientHandler(const std::string& url) {
   DCHECK(!client_handler_);
 
