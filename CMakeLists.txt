@@ -246,7 +246,7 @@ add_definitions(
     -DVCPKG_MANIFEST_INSTALL=ON
 )
 
-add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES} ${CEFCLIENT_SRCS})
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${CEFCLIENT_SRCS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/include/cef/
