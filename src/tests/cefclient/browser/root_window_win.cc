@@ -409,6 +409,8 @@ void RootWindowWin::RegisterRootClass(HINSTANCE hInstance,
     return;
   class_registered = true;
 
+  HBRUSH hBrBackground = CreateSolidBrush(RGB(31, 36, 41));
+
   WNDCLASSEX wcex;
 
   wcex.cbSize = sizeof(WNDCLASSEX);
@@ -420,7 +422,7 @@ void RootWindowWin::RegisterRootClass(HINSTANCE hInstance,
   wcex.hInstance = hInstance;
   wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CEFCLIENT));
   wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-  wcex.hbrBackground = background_brush;
+  wcex.hbrBackground = hBrBackground;
   wcex.lpszMenuName = MAKEINTRESOURCE(IDC_CEFCLIENT);
   wcex.lpszClassName = window_class.c_str();
   wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -1345,6 +1347,13 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
       }
     }
     return hit;
+  } else if(message == WM_ERASEBKGND) {
+    HDC hdc = (HDC)(wParam); 
+    RECT rc; GetClientRect(hWnd, &rc); 
+    HBRUSH brush = CreateSolidBrush(RGB(31, 36, 41));
+    FillRect(hdc, &rc, brush); 
+    DeleteObject(brush); // Free the created brush: see note below!
+    return TRUE;
   }
   
   return CallWindowProc(hParentWndProc, hWnd, message, wParam, lParam);
