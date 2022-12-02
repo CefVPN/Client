@@ -649,16 +649,15 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
 
       requested_client_rect->right -= frame_x + padding;
       requested_client_rect->left += frame_x + padding;
-      requested_client_rect->bottom -= frame_y + padding - 1;
+      requested_client_rect->bottom -= frame_y + padding;
 
       if(isWindowMaximized(hWnd))
       {
-        requested_client_rect->top += padding + 4.9;
+        requested_client_rect->top += padding + (4.9 * (int)scaleFactor);
       } else {
-        requested_client_rect->top += padding - 4.9;
+        requested_client_rect->top -= padding - (4.9 * (int)scaleFactor);
       }
         
-
       return 0;
       break;
     }
