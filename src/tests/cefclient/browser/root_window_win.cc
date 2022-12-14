@@ -1184,13 +1184,6 @@ void RootWindowWin::OnDestroyed() {
   NotifyDestroyedIfDone();
 }
 
-void RootWindowWin::ShowContextMenu() {
-  CefRefPtr<CefRunContextMenuCallback> callback;
-  RunContextMenu(callback);
-}
-
-
-
 void RootWindowWin::OnBrowserCreated(CefRefPtr<CefBrowser> browser) {
   REQUIRE_MAIN_THREAD();
 
@@ -1450,13 +1443,6 @@ void RootWindowWin::NotifyDestroyedIfDone() {
 
 void RootWindowWin::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
   model->AddItem(0, "Hellow World");
-}
-
-bool RootWindowWin::RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) {
-  CEF_REQUIRE_UI_THREAD();
-  callback->Cancel();
-
-  return true;
 }
 
 }  // namespace client

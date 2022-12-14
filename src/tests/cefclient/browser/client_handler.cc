@@ -31,8 +31,10 @@
 #include "tests/shared/common/client_switches.h"
 #include "tests/shared/common/string_util.h"
 
+#if defined(OS_WIN)
 // ovpn includes.
 #include "cefvpn.hpp"
+#endif
 
 namespace client {
 
@@ -403,6 +405,8 @@ void ClientHandler::DetachDelegate() {
   delegate_ = nullptr;
 }
 
+#if defined(OS_WIN)
+
 bool isWindowMaximized(HWND hwnd) {
   WINDOWPLACEMENT placement = {0};
   placement.length = sizeof(WINDOWPLACEMENT);
@@ -412,6 +416,8 @@ bool isWindowMaximized(HWND hwnd) {
   return false;
 }
 
+#endif
+
 bool ClientHandler::OnProcessMessageReceived(
     CefRefPtr<CefBrowser> browser,
     CefRefPtr<CefFrame> frame,
@@ -419,6 +425,7 @@ bool ClientHandler::OnProcessMessageReceived(
     CefRefPtr<CefProcessMessage> message) {
   CEF_REQUIRE_UI_THREAD();
 
+#if defined(OS_WIN)
 
   CefWindowHandle hwnd = GetParent(browser->GetHost()->GetWindowHandle());
 
@@ -439,6 +446,8 @@ bool ClientHandler::OnProcessMessageReceived(
   } else if(message->GetName() == "hide_wnd") {
     ShowWindow(hwnd, SW_HIDE);
   }
+
+#endif
 
   const auto finish_time = bv_utils::Now();
 
@@ -559,25 +568,6 @@ bool ClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
       return ExecuteTestMenu(command_id);
   }
 }
-
-bool ClientHandler::RunContextMenu(CefRefPtr<CefBrowser> browser,
-                                   CefRefPtr<CefFrame> frame,
-                                   CefRefPtr<CefContextMenuParams> params,
-                                   CefRefPtr<CefMenuModel> model,
-                                   CefRefPtr<CefRunContextMenuCallback> callback) {
-
-CEF_REQUIRE_UI_THREAD();
-
- //model->AddItem(CLIENT_ID_HIDE_CONTEXT, "Start Chrome");
-
-  callback->Cancel();
-  
-  if(delegate_)
-    delegate_->RunContextMenu(callback);
-
-  return true;
-}
-
 
 void ClientHandler::OnAddressChange(CefRefPtr<CefBrowser> browser,
                                     CefRefPtr<CefFrame> frame,

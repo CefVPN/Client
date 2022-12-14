@@ -108,8 +108,6 @@ int RunMain(int argc, char* argv[]) {
   std::unique_ptr<MainMessageLoop> message_loop;
   if (settings.multi_threaded_message_loop)
     message_loop.reset(new MainMessageLoopMultithreadedGtk);
-  else if (settings.external_message_pump)
-    message_loop = MainMessageLoopExternalPump::Create();
   else
     message_loop.reset(new MainMessageLoopStd);
 

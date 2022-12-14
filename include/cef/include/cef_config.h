@@ -35,6 +35,9 @@
 #ifndef CEF_INCLUDE_CEF_CONFIG_H_
 #define CEF_INCLUDE_CEF_CONFIG_H_
 
+#if defined(OS_LINUX)
+#define CEF_X11 1
+#endif
 
 
 #endif  // CEF_INCLUDE_CEF_CONFIG_H_

@@ -1,7 +1,10 @@
 #include "tests/shared/renderer/client_app_functions.h"
-#include <shellapi.h>
 #include <thread>
 #include <iostream>
+
+#if defined(OS_WIN)
+#include <shellapi.h>
+#endif
 
 namespace client {
     bool Cefvpn_v8Handler::Execute(

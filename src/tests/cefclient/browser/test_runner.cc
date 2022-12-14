@@ -770,6 +770,12 @@ void SetupResourceManager(CefRefPtr<CefResourceManager> resource_manager,
     resource_manager->AddDirectoryProvider(test_origin, resource_dir, 100,
                                            std::string());
   }
+#elif defined(OS_POSIX)
+  std::string resource_dir = "//home//op//Dev//CefVPN//app//out";
+  if (!resource_dir.empty()) {
+    resource_manager->AddDirectoryProvider(test_origin, resource_dir, 100,
+                                           std::string());
+  }
 #endif
 }
 

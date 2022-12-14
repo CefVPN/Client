@@ -108,7 +108,6 @@ class RootWindowWin : public RootWindow, public BrowserWindow::Delegate {
   void OnSetDraggableRegions(
       const std::vector<CefDraggableRegion>& regions) override;
   void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) override;
-  bool RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) override;
   void NotifyDestroyedIfDone();
 
   // After initialization all members are only accessed on the main thread.

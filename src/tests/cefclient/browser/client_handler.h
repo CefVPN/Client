@@ -85,8 +85,6 @@ class ClientHandler : public CefClient,
     // Called on the UI thread before a context menu is displayed.
     virtual void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {}
 
-    virtual bool RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) = 0;
-
    protected:
     virtual ~Delegate() {}
   };
@@ -147,13 +145,6 @@ class ClientHandler : public CefClient,
                            CefRefPtr<CefFrame> frame,
                            CefRefPtr<CefContextMenuParams> params,
                            CefRefPtr<CefMenuModel> model) override;
-  
-  // Run Context Menu
-  bool RunContextMenu(CefRefPtr<CefBrowser> browser,
-                      CefRefPtr<CefFrame> frame,
-                      CefRefPtr<CefContextMenuParams> params,
-                      CefRefPtr<CefMenuModel> model,
-                      CefRefPtr<CefRunContextMenuCallback> callback) override;
 
   bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
                             CefRefPtr<CefFrame> frame,

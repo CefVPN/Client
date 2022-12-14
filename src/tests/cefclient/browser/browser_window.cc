@@ -98,10 +98,4 @@ void BrowserWindow::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
   delegate_->OnBeforeContextMenu(model);
 }
 
-bool BrowserWindow::RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) {
-  REQUIRE_MAIN_THREAD();
-  delegate_->RunContextMenu(callback);
-  return false;
-}
-
 }  // namespace client

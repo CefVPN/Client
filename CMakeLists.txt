@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project (CefVPN)
 
-#set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-
 # Set CEF Version
-set(CEF_BIN_VERSION "cef_binary_107.1.11+g26c0b5e+chromium-107.0.5304.110")
+set(CEF_BIN_VERSION "cef_binary_107.1.12+g65b79a6+chromium-107.0.5304.122")
 
 # Cmake Modules.
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -151,21 +148,81 @@ set(CEFCLIENT_WINDOWS_SRCS
     src/tests/cefclient/resources/win/cefclient.rc
 )
 
-# Cef Config
+set(CEFCLIENT_LINUX_SRCS
+    #CEFCLIENT_LINUX_SHARED_BROWSER_SRCS
+    src/tests/shared/browser/main_message_loop_external_pump_linux.cc
+    src/tests/shared/browser/resource_util_posix.cc
+    #CEFCLIENT_LINUX_BROWSER_SRCS
+    src/tests/cefclient/browser/browser_window_std_gtk.cc
+    src/tests/cefclient/browser/browser_window_std_gtk.h
+    src/tests/cefclient/browser/dialog_handler_gtk.cc
+    src/tests/cefclient/browser/dialog_handler_gtk.h
+    src/tests/cefclient/browser/main_context_impl_posix.cc
+    src/tests/cefclient/browser/main_message_loop_multithreaded_gtk.cc
+    src/tests/cefclient/browser/main_message_loop_multithreaded_gtk.h
+    src/tests/cefclient/browser/print_handler_gtk.cc
+    src/tests/cefclient/browser/print_handler_gtk.h
+    src/tests/cefclient/browser/resource_util_linux.cc
+    src/tests/cefclient/browser/root_window_gtk.cc
+    src/tests/cefclient/browser/root_window_gtk.h
+    src/tests/cefclient/browser/temp_window_x11.cc
+    src/tests/cefclient/browser/temp_window_x11.h
+    src/tests/cefclient/browser/util_gtk.cc
+    src/tests/cefclient/browser/util_gtk.h
+    src/tests/cefclient/browser/window_test_runner_gtk.cc
+    src/tests/cefclient/browser/window_test_runner_gtk.h
+    src/cefclient_gtk.cc
+)
 
-set(CEF_VERSION_OS_ARCH ${CEF_BIN_VERSION}_windows64)
+set(CEFCLIENT_RESOURCES_SRCS
+    #CEFCLIENT_RESOURCES_RESOURCES_SRCS
+    src/tests/cefclient/resources/binding.html
+    src/tests/cefclient/resources/dialogs.html
+    src/tests/cefclient/resources/draggable.html
+    src/tests/cefclient/resources/ipc_performance.html
+    src/tests/cefclient/resources/localstorage.html
+    src/tests/cefclient/resources/logo.png
+    src/tests/cefclient/resources/media_router.html
+    src/tests/cefclient/resources/menu_icon.1x.png
+    src/tests/cefclient/resources/menu_icon.2x.png
+    src/tests/cefclient/resources/other_tests.html
+    src/tests/cefclient/resources/performance.html
+    src/tests/cefclient/resources/performance2.html
+    src/tests/cefclient/resources/preferences.html
+    src/tests/cefclient/resources/response_filter.html
+    src/tests/cefclient/resources/server.html
+    src/tests/cefclient/resources/transparency.html
+    src/tests/cefclient/resources/urlrequest.html
+    src/tests/cefclient/resources/websocket.html
+    src/tests/cefclient/resources/window.html
+    src/tests/cefclient/resources/xmlhttprequest.html
+    #CEFCLIENT_RESOURCES_RESOURCES_EXTENSIONS_SET_PAGE_COLOR_SRCS
+    src/tests/cefclient/resources/extensions/set_page_color/README.md
+    src/tests/cefclient/resources/extensions/set_page_color/icon.png
+    src/tests/cefclient/resources/extensions/set_page_color/manifest.json
+    src/tests/cefclient/resources/extensions/set_page_color/popup.html
+    src/tests/cefclient/resources/extensions/set_page_color/popup.js
+    #CEFCLIENT_RESOURCES_SHARED_RESOURCES_SRCS
+    src/tests/shared/resources/osr_test.html
+    src/tests/shared/resources/pdf.html
+    src/tests/shared/resources/pdf.pdf
+    src/tests/shared/resources/window_icon.1x.png
+    src/tests/shared/resources/window_icon.2x.png
+)
+
+# Cef Config
+if(OS_WINDOWS)
+    set(CEF_VERSION_OS_ARCH ${CEF_BIN_VERSION}_windows64)
+elseif(OS_LINUX)
+    set(CEF_VERSION_OS_ARCH ${CEF_BIN_VERSION}_linux64)
+endif()
+
 set(CEF_ROOT ${PROJECT_SOURCE_DIR}/third_party/cef-project/)
 set(CEF_BIN_ROOT ${CEF_ROOT}/third_party/cef/${CEF_VERSION_OS_ARCH})
 set(CEF_LIBCEF_DLL_LIB ${CEF_ROOT}/build/libcef_dll_wrapper)
 
 #VCPKG
 set(VCPKG_PATH ${PROJECT_SOURCE_DIR}/bin/vcpkg_installed/${VCPKG_TARGET_TRIPLET})
-
-find_package(asio CONFIG REQUIRED)
-find_package(lz4 CONFIG REQUIRED)
-find_package(OpenSSL REQUIRED)
-find_package(jsoncpp CONFIG REQUIRED)
-find_path(TAP_WINDOWS6_INCLUDE_DIRS "tap-windows.h")
 
 set(OPENVPN3_SRCS
     src/ovpncli.hpp
@@ -238,64 +295,136 @@ set(CEF_DEP_LIBS
 
 )
 
-add_definitions(
-    -DCMAKE_INTDIR="Debug"
-    ${WINDOWS_DEFS}
-    ${CEF_DEFS}
-    ${OPENVPN3_DEFINES}
-    -DVCPKG_MANIFEST_INSTALL=ON
-)
+if(OS_LINUX)
+    # All sources required by the "cefclient" target. Generates an executable that
+    # is used for all processes.
+    set(CEFCLIENT_SRCS
+        ${CEFCLIENT_BROWSER_SRCS}
+        ${CEFCLIENT_COMMON_SRCS}
+        ${CEFCLIENT_RENDERER_SRCS}
+        ${CEFCLIENT_RESOURCES_SRCS}
+        ${CEFCLIENT_LINUX_SRCS}
+    )
 
-add_executable(${PROJECT_NAME} ${SRC_FILES} ${CEFCLIENT_SRCS})
+    # Find required libraries and update compiler/linker variables.
+    FIND_LINUX_LIBRARIES("gmodule-2.0 gtk+-3.0 gthread-2.0 gtk+-unix-print-3.0 xi")
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    ${PROJECT_SOURCE_DIR}/include/cef/
-    ${PROJECT_SOURCE_DIR}/include/
-    ${PROJECT_SOURCE_DIR}/include/src/
-    ${PROJECT_SOURCE_DIR}/src/
-    ${VCPKG_PATH}/include/
-)
+    add_definitions(
+      -D__STDC_CONSTANT_MACROS
+      -D__STDC_FORMAT_MACROS
+      -D_FILE_OFFSET_BITS=64
+      -DCEF_USE_SANDBOX
+    )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    ${CEF_BIN_ROOT}/Debug/libcef.lib
-    ${CEF_LIBCEF_DLL_LIB}/Debug/libcef_dll_wrapper.lib
-    ${CEF_BIN_ROOT}/Debug/cef_sandbox.lib
-    Ws2_32.lib
-    Dbghelp.lib
-    Shlwapi.lib
-    Version.lib
-    Setupapi.lib
-    Propsys.lib
-    Powrprof.lib
-    Winmm.lib
-    delayimp.lib
-    Opengl32.lib
-    Oleacc.lib
-    Imm32.lib
-    D3D11.lib
-    Shell32.lib
-    Dwmapi.lib
-    ${OPENVPN3_DEP_LIBS}
-)
+    # Executable target.
+    add_executable(${PROJECT_NAME} ${CEFCLIENT_SRCS})
 
-# VCPKG libs...
-target_link_libraries(
-    ${PROJECT_NAME} PRIVATE
-    asio
-    asio::asio
-    lz4::lz4
-    OpenSSL::SSL
-    jsoncpp_object 
-    jsoncpp_static 
-)
-target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
+    target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PROJECT_SOURCE_DIR}/include/cef/
+        ${PROJECT_SOURCE_DIR}/include/
+        ${PROJECT_SOURCE_DIR}/include/src/
+        ${PROJECT_SOURCE_DIR}/src/
+    )
 
-target_include_directories(
-    ${PROJECT_NAME} PRIVATE 
-    ${TAP_WINDOWS6_INCLUDE_DIRS}
-)
+    SET_EXECUTABLE_TARGET_PROPERTIES(${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME} 
+        ${CEF_BIN_ROOT}/Debug/libcef.so
+        ${CEF_LIBCEF_DLL_LIB}/libcef_dll_wrapper.a
+        "GL" 
+        ${CEF_STANDARD_LIBS}
+    )
+
+    # Set rpath so that libraries can be placed next to the executable.
+    set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
+    set_target_properties(${PROJECT_NAME} PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
+    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/Debug)
+
+    # We don't call deprecated GTK functions, and they can cause build failures, so disable them.
+    add_definitions("-DGTK_DISABLE_DEPRECATED")
+
+    # Copy CEF binary and resource files to the target output directory.
+    COPY_FILES("${PROJECT_NAME}" "${CEF_BINARY_FILES}" "${CEF_BIN_ROOT}/Debug" "${PROJECT_SOURCE_DIR}/bin/Debug")
+    COPY_FILES("${PROJECT_NAME}" "${CEF_RESOURCE_FILES}" "${CEF_BIN_ROOT}/Resources" "${PROJECT_SOURCE_DIR}/bin/Debug")
+
+    # Copy cefclient resource files to the target output directory.
+    COPY_FILES("${PROJECT_NAME}" "${CEFCLIENT_RESOURCES_SRCS}" "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/bin/Debug/cefclient_files")
+
+    # Set SUID permissions on the chrome-sandbox target.
+    SET_LINUX_SUID_PERMISSIONS("${PROJECT_NAME}" "${PROJECT_SOURCE_DIR}/bin/Debug/chrome-sandbox")
+endif()
+
 
 if(OS_WINDOWS)
+
+    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+    set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
+    #vcpkg
+    find_package(asio CONFIG REQUIRED)
+    find_package(lz4 CONFIG REQUIRED)
+    find_package(OpenSSL REQUIRED)
+    find_package(jsoncpp CONFIG REQUIRED)
+    find_path(TAP_WINDOWS6_INCLUDE_DIRS "tap-windows.h")
+
+    add_definitions(
+        -DCMAKE_INTDIR="Debug"
+        ${WINDOWS_DEFS}
+        ${CEF_DEFS}
+        ${OPENVPN3_DEFINES}
+        -DVCPKG_MANIFEST_INSTALL=ON
+    )
+
+    add_executable(${PROJECT_NAME} ${SRC_FILES} ${CEFCLIENT_SRCS})
+
+    target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PROJECT_SOURCE_DIR}/include/cef/
+        ${PROJECT_SOURCE_DIR}/include/
+        ${PROJECT_SOURCE_DIR}/include/src/
+        ${PROJECT_SOURCE_DIR}/src/
+        ${VCPKG_PATH}/include/
+    )
+
+
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+        ${CEF_BIN_ROOT}/Debug/libcef.lib
+        ${CEF_LIBCEF_DLL_LIB}/Debug/libcef_dll_wrapper.lib
+        ${CEF_BIN_ROOT}/Debug/cef_sandbox.lib
+        Ws2_32.lib
+        Dbghelp.lib
+        Shlwapi.lib
+        Version.lib
+        Setupapi.lib
+        Propsys.lib
+        Powrprof.lib
+        Winmm.lib
+        delayimp.lib
+        Opengl32.lib
+        Oleacc.lib
+        Imm32.lib
+        D3D11.lib
+        Shell32.lib
+        Dwmapi.lib
+        ${OPENVPN3_DEP_LIBS}
+    )
+
+
+    # VCPKG libs...
+    target_link_libraries(
+        ${PROJECT_NAME} PRIVATE
+        asio
+        asio::asio
+        lz4::lz4
+        OpenSSL::SSL
+        jsoncpp_object 
+        jsoncpp_static 
+    )
+    target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
+
+    target_include_directories(
+        ${PROJECT_NAME} PRIVATE 
+        ${TAP_WINDOWS6_INCLUDE_DIRS}
+    )
+
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
