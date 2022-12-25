@@ -11,7 +11,8 @@ module.exports = {
         Sidebar_dbg: "#282C34"
       },
       transitionProperty: {
-        'width': 'width'
+        'width': 'width',
+        'height': 'height'
       },
     },
   },

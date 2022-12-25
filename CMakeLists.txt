@@ -241,6 +241,7 @@ set(CEFCLIENT_SRCS
 
 set(SRC_FILES
     src/cefclient_win.cc
+    src/cef_helper.h
     ${CEFCLIENT_SRCS}
 )
 

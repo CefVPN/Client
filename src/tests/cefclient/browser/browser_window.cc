@@ -93,6 +93,11 @@ void BrowserWindow::OnSetDraggableRegions(
   delegate_->OnSetDraggableRegions(regions);
 }
 
+void BrowserWindow::OnMaximizeHover(bool state) {
+  REQUIRE_MAIN_THREAD();
+  delegate_->OnMaximizeHover(state);
+}
+
 void BrowserWindow::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
   CEF_REQUIRE_UI_THREAD();
   delegate_->OnBeforeContextMenu(model);

@@ -86,6 +86,8 @@ class RootWindowViews : public RootWindow,
   void OnTakeFocus(bool next) override;
   void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) override;
 
+  void OnMaximizeHover(bool state) override;
+
  private:
   void CreateClientHandler(const std::string& url);
 

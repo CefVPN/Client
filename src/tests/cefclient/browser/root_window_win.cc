@@ -2,6 +2,7 @@
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
+
 #include "tests/cefclient/browser/root_window_win.h"
 
 #include <shellscalingapi.h>
@@ -18,9 +19,12 @@
 #include "tests/shared/browser/main_message_loop.h"
 #include "tests/shared/browser/util_win.h"
 #include "tests/shared/common/client_switches.h"
+#include "cef_helper.h"
 
 #include <shellapi.h>
 #include <dwmapi.h>
+
+#include <iostream>
 
 #define MAX_URL_LENGTH 255
 #define BUTTON_WIDTH 72
@@ -550,6 +554,7 @@ NOTIFYICONDATA nid = {};
 #define ID_DISPLAY_APP_LYCF 103
 #define ID_LYCF_CLOSE 104
 bool NotifyCon = true;
+static bool MaximizeButtonHovered;
 
 // static
 LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
@@ -584,6 +589,28 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
     self->OnFindEvent();
     return 0;
   }
+    // Calculate the Location on Max Button for Snap Layouts..
+    RECT WndowSz;
+    GetClientRect(hWnd, &WndowSz);
+
+    float scaleFactor = 1.0f;
+    scaleFactor = GetWindowScaleFactor(hWnd);
+
+    int x1, y1, x2, y2;
+
+    x1 = (WndowSz.top + WndowSz.right) - (89 * (int)scaleFactor);
+    y1 = 1 * (int)scaleFactor;
+    x2 = (WndowSz.right + WndowSz.top) - (43 * (int)scaleFactor);
+    y2 = 32 * (int)scaleFactor;
+
+    //HRGN MaxBtn = CreateRectRgn(x1, y1, x2, y2);
+
+    RECT MaxBtn;
+    MaxBtn.left = x1;
+    MaxBtn.top = y1;
+    MaxBtn.right = x2;
+    MaxBtn.bottom = y2;
+
 
   // Callback for the main window
   switch (message) {
@@ -703,13 +730,32 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
         break;
     }
     case WM_NCHITTEST: {
+/*
       LRESULT hit = DefWindowProc(hWnd, message, wParam, lParam);
+      
+      // Calculate the Location on Max Button for Snap Layouts..
+      RECT WndowSz;
+      GetClientRect(hWnd, &WndowSz);
+
+      float scaleFactor = 1.0f;
+      scaleFactor = GetWindowScaleFactor(hWnd);
+
+      int x1, y1, x2, y2;
+
+      x1 = (WndowSz.top + WndowSz.right) - (89 * (int)scaleFactor);
+      y1 = 1 * (int)scaleFactor;
+      x2 = (WndowSz.right + WndowSz.top) - (43 * (int)scaleFactor);
+      y2 = 32 * (int)scaleFactor;
+
+      HRGN MaxBtn = CreateRectRgn(x1, y1, x2, y2);
+
       if (hit == HTCLIENT) {
         POINTS points = MAKEPOINTS(lParam);
         POINT point = {points.x, points.y};
         ::ScreenToClient(hWnd, &point);
         // Looks like adjustment happening in NCCALCSIZE is messing with the detection
         // of the top hit area so manually fixing that.
+
         if(!isWindowMaximized(hWnd))
         {
           Fullscreened = false;
@@ -725,8 +771,89 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
           // dragging.
           return HTCAPTION;
         }
+
+        if() {
+          return HTMAXBUTTON;
+        }
       }
       return hit;
+
+*/
+    LRESULT hit = DefWindowProc(hWnd, message, wParam, lParam);
+      POINT cursor_point = {0};
+      cursor_point.x = LOWORD(lParam);
+      cursor_point.y = HIWORD(lParam);
+      ScreenToClient(hWnd, &cursor_point);
+
+      switch (hit) {
+        case HTNOWHERE:
+        case HTRIGHT:
+        case HTLEFT:
+        case HTTOPLEFT:
+        case HTTOP:
+        case HTTOPRIGHT:
+        case HTBOTTOMRIGHT:
+        case HTBOTTOM:
+        case HTBOTTOMLEFT: {
+          return hit;
+        }
+      }
+      // Check if hover button is on maximize to support SnapLayout on Windows 11 
+      /* // TODO
+        if(self->onMaxButton_) {
+          if (::PtInRect(&MaxBtn, cursor_point)) {
+            return HTMAXBUTTON;
+          }
+        }
+      */
+
+        if(!isWindowMaximized(hWnd))
+        {
+          Fullscreened = false;
+          if (cursor_point.y >= 0 && cursor_point.y <= 6 && cursor_point.x >= 5) {
+            return hit = HTTOP;
+          } else if(cursor_point.x <= 5 && cursor_point.y <= 6)
+            return HTTOPLEFT;
+        } else {
+          Fullscreened = true;
+        }
+
+      // Since we are drawing our own caption, this needs to be a custom test
+      if (::PtInRegion(self->draggable_region_, cursor_point.x, cursor_point.y)) {
+        return HTCAPTION;
+      }
+
+      return HTCLIENT;
+    }
+    case WM_LBUTTONUP: {
+      switch(wParam) {
+        case HTMAXBUTTON: {
+          ShowWindow(hWnd, isWindowMaximized(hWnd) ? SW_RESTORE : SW_MAXIMIZE);
+          break;
+        }
+      }
+      break;
+    }
+    case WM_NCRBUTTONUP: {
+      int mx = (int)LOWORD(lParam);   
+      int my = (int)HIWORD(lParam);
+
+      POINT m_pt; m_pt.x = mx; m_pt.y = my;
+
+      //ShowWindow(hWnd, SW_HIDE);
+
+      switch(wParam) {
+        case HTCAPTION: {
+          HMENU sysmenu = GetSystemMenu(hWnd, false);
+
+          TrackPopupMenu(sysmenu, TPM_RIGHTBUTTON | TPM_LEFTBUTTON | TPM_RETURNCMD, mx, my, 0, hWnd, NULL);
+          // TODO Implement
+          break;
+        }
+      }
+
+
+      break;
     }
     case WM_CEFVPN: {
       switch (lParam)
@@ -1321,8 +1448,33 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
     return DecodeGesture(hWnd, message, wParam, lParam);
   }
 
+      // Calculate the Location on Max Button for Snap Layouts..
+    RECT WndowSz;
+    GetClientRect(hWnd, &WndowSz);
+
+    float scaleFactor = 1.0f;
+    scaleFactor = GetWindowScaleFactor(hWnd);
+
+    int x1, y1, x2, y2;
+
+    x1 = (WndowSz.top + WndowSz.right) - (89 * scaleFactor);
+    y1 = 1 * scaleFactor;
+    x2 = (WndowSz.top + WndowSz.right) - (43 * scaleFactor);
+    y2 = 32 * scaleFactor;
+
+    //HRGN MaxBtn = CreateRectRgn(x1, y1, x2, y2);
+
+    RECT MaxBtn;
+    MaxBtn.left = x1;
+    MaxBtn.top = y1;
+    MaxBtn.right = x2;
+    MaxBtn.bottom = y2;
+
+    //std::cout << "x1: " << x1 << ", y1: " << y1 << ", x2: " << x2 << ", y2: " << y2 << std::endl;
+
   if (message == WM_NCHITTEST) {
     LRESULT hit = CallWindowProc(hParentWndProc, hWnd, message, wParam, lParam);
+/*
     if (hit == HTCLIENT) {
       POINTS points = MAKEPOINTS(lParam);
       POINT point = {points.x, points.y};
@@ -1337,8 +1489,58 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
         // in child windows.
         return HTTRANSPARENT;
       }
+
+      if(::PtInRegion(MaxBtn, point.x, point.y)) {
+          return HTTRANSPARENT;
+      }
+
     }
     return hit;
+  */
+
+  switch (hit) {
+    case HTNOWHERE:
+    case HTRIGHT:
+    case HTLEFT:
+    case HTTOPLEFT:
+    case HTTOP:
+    case HTTOPRIGHT:
+    case HTBOTTOMRIGHT:
+    case HTBOTTOM:
+    case HTBOTTOMLEFT: {
+      return hit;
+    }
+  }
+
+  POINTS points = MAKEPOINTS(lParam);
+  POINT point = {points.x, points.y};
+  ::ScreenToClient(hWnd, &point);
+  if(!Fullscreened)
+  {
+    if(point.y >= 0 && point.y <= 6 && point.x >= 5)
+      return HTTRANSPARENT;
+  }
+  if (::PtInRegion(hRegion, point.x, point.y)) {
+    // Let the parent window handle WM_NCHITTEST by returning HTTRANSPARENT
+    // in child windows.
+    return HTTRANSPARENT;
+  }
+
+  POINT max_point = { LOWORD(lParam), HIWORD(lParam) };
+
+  ::MapWindowPoints(nullptr, hWnd, &max_point, 1);
+
+// TODO
+/*
+if(::PtInRect(&MaxBtn, point)) {
+  if(MaximizeButtonHovered) {
+    //std::cout << "Cursor Inside Max Button";
+    return HTTRANSPARENT; 
+  }
+}
+*/
+  return HTCLIENT;
+
   } else if(message == WM_ERASEBKGND) {
     HDC hdc = (HDC)(wParam); 
     RECT rc; GetClientRect(hWnd, &rc); 
@@ -1347,7 +1549,6 @@ LRESULT CALLBACK SubclassedWindowProc(HWND hWnd,
     DeleteObject(brush); // Free the created brush: see note below!
     return TRUE;
   }
-  
   return CallWindowProc(hParentWndProc, hWnd, message, wParam, lParam);
 }
 
@@ -1442,7 +1643,12 @@ void RootWindowWin::NotifyDestroyedIfDone() {
 }
 
 void RootWindowWin::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
-  model->AddItem(0, "Hellow World");
+
+}
+
+void RootWindowWin::OnMaximizeHover(bool state) {
+  onMaxButton_ = state;
+  MaximizeButtonHovered = state;
 }
 
 }  // namespace client

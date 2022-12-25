@@ -41,8 +41,6 @@ class BrowserWindowStdWin : public BrowserWindow {
   void SetBounds(int x, int y, size_t width, size_t height) override;
   void SetFocus(bool focus) override;
 
-  bool RunContextMenu(CefRefPtr<CefRunContextMenuCallback> callback) override;
-
   ClientWindowHandle GetWindowHandle() const override;
 
  private:

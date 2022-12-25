@@ -85,6 +85,9 @@ class ClientHandler : public CefClient,
     // Called on the UI thread before a context menu is displayed.
     virtual void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {}
 
+    // Called when User is Over Maximize Button.
+    virtual void OnMaximizeHover(bool state) = 0;
+
    protected:
     virtual ~Delegate() {}
   };
@@ -368,6 +371,7 @@ class ClientHandler : public CefClient,
   void NotifyAutoResize(const CefSize& new_size);
   void NotifyLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
   void NotifyDraggableRegions(const std::vector<CefDraggableRegion>& regions);
+  void NotifyMaximizeHover(bool state);
   void NotifyTakeFocus(bool next);
 
   // Test context menu creation.

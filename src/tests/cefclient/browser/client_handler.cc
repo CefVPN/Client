@@ -34,7 +34,11 @@
 #if defined(OS_WIN)
 // ovpn includes.
 #include "cefvpn.hpp"
+#include "cef_helper.h"
 #endif
+
+
+bool cefvpn::WinHelper::ShowSnapLayouts = false;
 
 namespace client {
 
@@ -405,7 +409,10 @@ void ClientHandler::DetachDelegate() {
   delegate_ = nullptr;
 }
 
+
 #if defined(OS_WIN)
+
+
 
 bool isWindowMaximized(HWND hwnd) {
   WINDOWPLACEMENT placement = {0};
@@ -445,6 +452,10 @@ bool ClientHandler::OnProcessMessageReceived(
     ShowWindow(hwnd, isWindowMaximized(hwnd) ? SW_NORMAL : SW_MAXIMIZE);
   } else if(message->GetName() == "hide_wnd") {
     ShowWindow(hwnd, SW_HIDE);
+  } else if(message->GetName() == "OnSnapLayouts:1") {
+    ClientHandler::NotifyMaximizeHover(true);
+  } else if(message->GetName() == "OnSnapLayouts:0") {
+    ClientHandler::NotifyMaximizeHover(false);
   }
 
 #endif
@@ -1379,6 +1390,11 @@ void ClientHandler::NotifyDraggableRegions(
 
   if (delegate_)
     delegate_->OnSetDraggableRegions(regions);
+}
+
+void ClientHandler::NotifyMaximizeHover(bool state) {
+  if(delegate_)
+    delegate_->OnMaximizeHover(state);
 }
 
 void ClientHandler::NotifyTakeFocus(bool next) {

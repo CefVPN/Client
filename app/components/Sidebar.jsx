@@ -28,7 +28,7 @@ export default function Sidebar() {
             <li 
             key={key} 
             className="row text-white h-full cursor-pointer hover:bg-slate-600"
-            onClick={() => router.push(val.link) }
+            onClick={() => router.push(val.link)}
             >
               <div className="sidebarlist pt-4 pb-4 ml-2 mr-2  transition-colors duration-100 flex rounded-md">
                   <div id='icon' className="stroke-white ml-5 justify-center items-center">{val.icon}</div>{" "}
