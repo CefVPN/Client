@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function Handler() {
+export function Handler(update, ret) {
   window.str_cr();
 }
 

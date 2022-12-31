@@ -7,14 +7,16 @@
 #pragma once
 
 #include <set>
-
 #include "tests/shared/common/client_app.h"
+#include "tests/shared/renderer/client_app_functions.h"
+
 
 namespace client {
 
 // Client app implementation for the renderer process.
 class ClientAppRenderer : public ClientApp, public CefRenderProcessHandler {
  public:
+
   // Interface for renderer delegates. All Delegates must be returned via
   // CreateDelegates. Do not perform work in the Delegate
   // constructor. See CefRenderProcessHandler for documentation.
@@ -77,6 +79,7 @@ class ClientAppRenderer : public ClientApp, public CefRenderProcessHandler {
  private:
   // Creates all of the Delegate objects. Implemented by cefclient in
   // client_app_delegates_renderer.cc
+
   static void CreateDelegates(DelegateSet& delegates);
 
   // CefApp methods.
@@ -110,6 +113,9 @@ class ClientAppRenderer : public ClientApp, public CefRenderProcessHandler {
                                 CefRefPtr<CefProcessMessage> message) override;
 
  private:
+
+  client::Cefvpn_v8Handler *_cefV8Handler;
+
   // Set of supported Delegates.
   DelegateSet delegates_;
 

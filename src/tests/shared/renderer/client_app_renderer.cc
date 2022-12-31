@@ -3,7 +3,6 @@
 // can be found in the LICENSE file.
 
 #include "tests/shared/renderer/client_app_renderer.h"
-#include "tests/shared/renderer/client_app_functions.h"
 
 #include "include/base/cef_logging.h"
 
@@ -49,19 +48,19 @@ void ClientAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
 
   CefRefPtr<CefV8Value> object = context->GetGlobal();
 
-  CefRefPtr<CefV8Handler> handler = new Cefvpn_v8Handler();
+  _cefV8Handler = new Cefvpn_v8Handler();
 
-  object->SetValue("str_cr", CefV8Value::CreateFunction("str_cr", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  object->SetValue("str_cr", CefV8Value::CreateFunction("str_cr", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
-  object->SetValue("dis_cr", CefV8Value::CreateFunction("dis_cr", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  object->SetValue("dis_cr", CefV8Value::CreateFunction("dis_cr", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
-  object->SetValue("min_wnd", CefV8Value::CreateFunction("min_wnd", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  object->SetValue("min_wnd", CefV8Value::CreateFunction("min_wnd", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
-  object->SetValue("max_wnd", CefV8Value::CreateFunction("max_wnd", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  object->SetValue("max_wnd", CefV8Value::CreateFunction("max_wnd", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
-  object->SetValue("hide_wnd", CefV8Value::CreateFunction("hide_wnd", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  object->SetValue("hide_wnd", CefV8Value::CreateFunction("hide_wnd", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
-  object->SetValue("OnSnapLayouts", CefV8Value::CreateFunction("OnSnapLayouts", handler), V8_PROPERTY_ATTRIBUTE_NONE); 
+  object->SetValue("OnSnapLayouts", CefV8Value::CreateFunction("OnSnapLayouts", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE); 
 
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
@@ -71,6 +70,13 @@ void ClientAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
 void ClientAppRenderer::OnContextReleased(CefRefPtr<CefBrowser> browser,
                                           CefRefPtr<CefFrame> frame,
                                           CefRefPtr<CefV8Context> context) {
+
+  //Cefvpn_v8Handler* cefvpn_v8;
+
+  //cefvpn_v8->ReleaseCallbacks(context);
+
+  _cefV8Handler->ReleaseCallbacks(context);
+
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnContextReleased(this, browser, frame, context);
@@ -103,8 +109,29 @@ bool ClientAppRenderer::OnProcessMessageReceived(
     CefProcessId source_process,
     CefRefPtr<CefProcessMessage> message) {
   DCHECK_EQ(source_process, PID_BROWSER);
-
+ 
   bool handled = false;
+
+  CefRefPtr<CefV8Context> v8context = browser->GetMainFrame()->GetV8Context();
+
+  if(message->GetName() == "CONNECT:STAT") {
+    CefRefPtr<CefListValue> ig_args = message->GetArgumentList();
+
+    bool connected = ig_args->GetString(0) == "STATUS:CONNECTED" ? true : false;
+
+    if(connected) {
+      //frame->ExecuteJavaScript("alert('SUCESS!: VPN CONNECTED!!!')", frame->GetURL(), 0);
+      handled = true;
+    }
+  } else if(message->GetName() == "CEFVPN:STATE:CONNECTED") {
+
+    //Cefvpn_v8Handler* cefvpn_v8;
+
+    //cefvpn_v8->ExecuteFunction(message->GetName(), browser, nullptr, 0);
+
+    _cefV8Handler->ExecuteFunction(message->GetName(), browser, nullptr, 0);
+
+  }
 
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end() && !handled; ++it) {

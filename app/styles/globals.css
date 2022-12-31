@@ -32,6 +32,23 @@ a {
   zoom: reset;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader {
+  transform: rotate(0deg);
+  transition-property: transform;
+  transition-duration: 500ms;
+}
+
+.loader-spin {
+  animation: spin 1s linear infinite;
+  animation-delay: 150ms;
+}
+
 /*
 @media (prefers-color-scheme: dark) {
   html {

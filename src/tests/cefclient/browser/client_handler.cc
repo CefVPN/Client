@@ -40,6 +40,10 @@
 
 bool cefvpn::WinHelper::ShowSnapLayouts = false;
 
+// VPN Defs
+bool cefvpn::ovpn::isConnected;
+bool cefvpn::ovpn::isConnecting;
+
 namespace client {
 
 #if defined(OS_WIN)
@@ -310,6 +314,8 @@ void OnTestSMRProcessMessageReceived(
 
 }  // namespace
 
+
+
 class ClientDownloadImageCallback : public CefDownloadImageCallback {
  public:
   explicit ClientDownloadImageCallback(CefRefPtr<ClientHandler> client_handler)
@@ -438,12 +444,23 @@ bool ClientHandler::OnProcessMessageReceived(
 
   if(message->GetName() == "str_cr")
   {
-    std::cout << "Button Clicked!\n";
+    std::cout << "[CefVPN:EXEC: CONNECT]\n";
     std::thread c(cefvpn::ovpn::connect);
     c.detach();
-    return true;
+
+    cefvpn::ovpn::NotifyConnectState(browser);
+
+    CefRefPtr<CefProcessMessage> Ignit_stat = CefProcessMessage::Create("CONNECT:STAT");
+      
+    CefRefPtr<CefListValue> args = Ignit_stat->GetArgumentList();
+
+      std::string arg_msg = "STATUS:CONNECTED";
+
+      args->SetString(0, arg_msg);
+
+      browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, Ignit_stat);
   } else if(message->GetName() == "dis_cr") {
-    std::cout << "Button Clicked!\n";
+    std::cout << "[CefVPN:EXEC: DISCONNECT]\n";
     std::thread d(cefvpn::ovpn::disconnect);
     d.detach();
   } else if(message->GetName() == "min_wnd") {
