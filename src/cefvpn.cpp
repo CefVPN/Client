@@ -4,7 +4,11 @@
 #include <openvpn/client/clievent.hpp>
 #include <openvpn/time/timestr.hpp>
 
+#include <shellapi.h>
+
 std::string cefvpn::ovpn::state;
+
+class __declspec(uuid("9D0B8B92-4E1C-488e-A1E1-2331AFCE2CB5")) PrinterIcon;
 
 using namespace openvpn;
 
@@ -15,6 +19,10 @@ private:
     {
 
         cefvpn::ovpn::isConnected = ev.name == "CONNECTED" ? true : false;
+
+        if(cefvpn::ovpn::isConnected) {
+            cefvpn::OS::Shell_Notify(L"CefVPN Client", L"CONNECTED!");
+        }
 
         if(ev.name != "CONNECTED" && ev.name != "DISCONNECTED") {
             cefvpn::ovpn::isConnecting = 1;
@@ -27,7 +35,7 @@ private:
 
     virtual void log(const ClientAPI::LogInfo &info) override
     {
-       // std::cout << "[" << date_time() << "] " << info.text << std::flush;
+        std::cout << "[" << date_time() << "] " << info.text << std::flush;
     }
 
     virtual void external_pki_cert_request(ClientAPI::ExternalPKICertRequest &certreq) override
@@ -92,6 +100,18 @@ void cefvpn::ovpn::UpdateConnectState(std::string state) {
 
     cef_browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, msg);
 
-    std::cout << VPN_STATE << std::endl;
+    //std::cout << VPN_STATE << std::endl;
 
+}
+
+bool cefvpn::OS::Shell_Notify(std::wstring title, std::wstring message) {
+
+    // Display a low ink balloon message. This is a warning, so show the appropriate system icon.
+    NOTIFYICONDATAW nid = { };
+    nid.uFlags = NIF_INFO | NIF_GUID;
+    nid.guidItem = __uuidof(PrinterIcon);
+    nid.dwInfoFlags = NIIF_ERROR;
+    wcscpy_s(nid.szInfoTitle, L"CefVPN Status:");
+    wcscpy_s(nid.szInfo, L"CONNECTED!~");
+    return Shell_NotifyIcon(NIM_MODIFY, &nid);
 }

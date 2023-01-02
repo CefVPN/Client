@@ -21,4 +21,9 @@ namespace cefvpn
 
         virtual ~ovpn();
     };
+    class OS
+    {
+    public:
+        static bool Shell_Notify(std::wstring title, std::wstring message);
+    };
 }

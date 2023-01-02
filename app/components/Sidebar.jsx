@@ -27,12 +27,12 @@ export default function Sidebar() {
           return (
             <li 
             key={key} 
-            className="row text-white h-full cursor-pointer hover:bg-slate-600"
+            className="row text-white h-full cursor-pointer hover:bg-slate-600 transition-colors duration-100"
             onClick={() => router.push(val.link)}
             >
               <div className="sidebarlist pt-4 pb-4 ml-2 mr-2  transition-colors duration-100 flex rounded-md">
                   <div id='icon' className="stroke-white ml-5 justify-center items-center">{val.icon}</div>{" "}
-                  <div id="title" className={isHovering ? "whitespace-nowrap ml-5 transition-all delay-1000" : "whitespace-nowrap hidden"}>
+                  <div id="title" className={isHovering ? "whitespace-nowrap ml-5 delay-100" : "whitespace-nowrap hidden"}>
                     {val.title}
                   </div>
               </div>

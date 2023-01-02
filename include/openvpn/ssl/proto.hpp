@@ -4,7 +4,7 @@
 //               packet encryption, packet authentication, and
 //               packet compression.
 //
-//    Copyright (C) 2012-2020 OpenVPN Inc.
+//    Copyright (C) 2012-2022 OpenVPN Inc.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License Version 3
@@ -184,9 +184,6 @@ namespace openvpn {
       CONTROL_HARD_RESET_CLIENT_V3 = 10,  // initial key from client, forget previous state
       CONTROL_HARD_RESET_SERVER_V2 = 8,   // initial key from server, forget previous state
 
-      // define the range of legal opcodes
-      FIRST_OPCODE =                3,
-      LAST_OPCODE =                 9,
       INVALID_OPCODE =              0,
 
       // DATA_V2 constants
@@ -228,7 +225,7 @@ namespace openvpn {
        IV_PROTO_AUTH_PENDING_KW=(1<<4),
        IV_PROTO_NCP_P2P=(1<<5), // not implemented
        IV_PROTO_DNS_OPTION=(1<<6),
-       IV_PROTO_CC_EXIT_NOTIFY=(1<<7), // not implemented
+       IV_PROTO_CC_EXIT_NOTIFY=(1<<7),
        IV_PROTO_AUTH_FAIL_TEMP=(1<<8)
     };
 
@@ -316,6 +313,9 @@ namespace openvpn {
       // transmit username/password creds to server (client-only)
       bool xmit_creds = true;
 
+      // send client exit notifications via control channel
+      bool cc_exit_notify = false;
+
       // Transport protocol, i.e. UDPv4, etc.
       Protocol protocol; // set with set_protocol()
 
@@ -338,10 +338,6 @@ namespace openvpn {
       TLSCryptContext::Ptr tls_crypt_context;
 
       TLSCryptMetadataFactory::Ptr tls_crypt_metadata_factory;
-
-      // reliability layer parms
-      reliable::id_t reliable_window = 0;
-      size_t max_ack_list = 0;
 
       // packet_id parms for both data and control channels
       int pid_mode = 0;                // PacketIDReceive::UDP_MODE or PacketIDReceive::TCP_MODE
@@ -383,8 +379,6 @@ namespace openvpn {
 		const int default_key_direction, const bool server)
       {
 	// first set defaults
-	reliable_window = 4;
-	max_ack_list = 4;
 	handshake_window = Time::Duration::seconds(60);
 	renegotiate = Time::Duration::seconds(3600);
 	tls_timeout = Time::Duration::seconds(1);
@@ -665,6 +659,38 @@ namespace openvpn {
 	      OPENVPN_THROW(process_server_push_error, "Problem accepting key-derivation method '" << key_method << "': " << e.what());
 	    }
 	}
+
+	// protocol-flags
+	try
+	  {
+	    const Option *o = opt.get_ptr("protocol-flags");
+	    if (o)
+	      {
+		o->min_args(2);
+		for (std::size_t i = 1; i < o->size(); i++)
+		  {
+		    std::string flag = o->get(i, 128);
+		    if (flag == "cc-exit")
+		      {
+			cc_exit_notify = true;
+		      }
+		    else if (flag == "tls-ekm")
+		      {
+			// Overrides "key-derivation" method set above
+			dc.set_key_derivation(CryptoAlgs::KeyDerivation::TLS_EKM);
+		      }
+		    else
+		      {
+			OPENVPN_THROW(process_server_push_error, "unknown flag '" << flag << "'");
+		      }
+		  }
+	      }
+	  }
+	catch (const std::exception& e)
+	  {
+	    OPENVPN_THROW(process_server_push_error, "Problem accepting protocol-flags: " << e.what());
+	  }
+
 	// compression
 	std::string new_comp;
 	try {
@@ -887,6 +913,7 @@ namespace openvpn {
 	  | IV_PROTO_REQUEST_PUSH
 	  | IV_PROTO_AUTH_PENDING_KW
 	  | IV_PROTO_DNS_OPTION
+	  | IV_PROTO_CC_EXIT_NOTIFY
 	  | IV_PROTO_AUTH_FAIL_TEMP;
 
 	if (SSLLib::SSLAPI::support_key_material_export())
@@ -1203,7 +1230,7 @@ namespace openvpn {
 		    out << " PID=" << pid.str();
 	          }
 
-	        ReliableAck ack(0);
+	        ReliableAck ack{};
 	        ack.read(b);
 	        const bool dest_psid_defined = !ack.empty();
 	        out << " ACK=[";
@@ -1512,8 +1539,7 @@ namespace openvpn {
       KeyContext(ProtoContext& p, const bool initiator)
 	: Base(*p.config->ssl_factory,
 	       p.config->now, p.config->tls_timeout,
-	       p.config->frame, p.stats,
-	       p.config->reliable_window, p.config->max_ack_list),
+	       p.config->frame, p.stats),
 	  proto(p),
 	  state(STATE_UNDEF),
 	  crypto_flags(0),
@@ -1776,13 +1802,11 @@ namespace openvpn {
       // send explicit-exit-notify message to peer
       void send_explicit_exit_notify()
       {
-#ifndef OPENVPN_DISABLE_EXPLICIT_EXIT // explicit exit should always be enabled in production
 	if (crypto_flags & CryptoDCInstance::EXPLICIT_EXIT_NOTIFY_DEFINED)
 	  crypto->explicit_exit_notify();
 	else
 	  send_data_channel_message(proto_context_private::explicit_exit_notify_message,
 				    sizeof(proto_context_private::explicit_exit_notify_message));
-#endif
       }
 
       // general purpose method for sending constant string messages
@@ -2570,10 +2594,10 @@ namespace openvpn {
 	active_event();
       }
 
-      void prepend_dest_psid_and_acks(Buffer& buf)
+      void prepend_dest_psid_and_acks(Buffer &buf, unsigned int opcode)
       {
 	// if sending ACKs, prepend dest PSID
-	if (!xmit_acks.empty())
+	if (xmit_acks.acks_ready())
 	  {
 	    if (proto.psid_peer.defined())
 	      proto.psid_peer.prepend(buf);
@@ -2585,7 +2609,7 @@ namespace openvpn {
 	  }
 
 	// prepend ACKs for messages received from peer
-	xmit_acks.prepend(buf);
+	xmit_acks.prepend(buf, opcode == ACK_V1);
       }
 
       bool verify_src_psid(const ProtoSessionID& src_psid)
@@ -2715,7 +2739,7 @@ namespace openvpn {
 	ReliableAck::prepend_id(buf, id);
 
 	// prepend dest PSID and ACKs to reply to peer
-	prepend_dest_psid_and_acks(buf);
+        prepend_dest_psid_and_acks(buf, pkt.opcode);
 
 	// generate message head
         int opcode = pkt.opcode;
@@ -2732,7 +2756,7 @@ namespace openvpn {
 	BufferAllocated& buf = *pkt.buf;
 
 	// prepend dest PSID and ACKs to reply to peer
-	prepend_dest_psid_and_acks(buf);
+        prepend_dest_psid_and_acks(buf, pkt.opcode);
 
 	gen_head(ACK_V1, buf);
       }
@@ -3655,8 +3679,22 @@ namespace openvpn {
     // they are disconnecting
     void send_explicit_exit_notify()
     {
-      if (is_client() && is_udp() && primary)
-	primary->send_explicit_exit_notify();
+#ifndef OPENVPN_DISABLE_EXPLICIT_EXIT // explicit exit should always be enabled in production
+      if (!is_client() || !is_udp() || !primary)
+	{
+	  return;
+	}
+
+      if (config->cc_exit_notify)
+	{
+	  write_control_string(std::string("EXIT"));
+	  primary->flush();
+	}
+      else
+	{
+	  primary->send_explicit_exit_notify();
+	}
+#endif // OPENVPN_DISABLE_EXPLICIT_EXIT
     }
 
     // should be called after a successful network packet transmit
