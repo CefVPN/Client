@@ -556,6 +556,65 @@ NOTIFYICONDATA nid = {};
 bool NotifyCon = true;
 static bool MaximizeButtonHovered;
 
+void ShowSystemMenu(HWND hWnd, int x, int y) {
+    HMENU sysmenu = GetSystemMenu(hWnd, false);
+
+    if(isWindowMaximized(hWnd))
+    {
+    EnableMenuItem(sysmenu, SC_SIZE,
+      MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+    EnableMenuItem(sysmenu, SC_MAXIMIZE,
+      MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+    EnableMenuItem(sysmenu, SC_MOVE,
+      MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+
+    EnableMenuItem(sysmenu, SC_RESTORE,
+      MF_BYCOMMAND | MF_ENABLED);
+
+    } else {
+      EnableMenuItem(sysmenu, SC_RESTORE,
+        MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+
+    EnableMenuItem(sysmenu, SC_SIZE,
+      MF_BYCOMMAND | MF_ENABLED);
+    EnableMenuItem(sysmenu, SC_MAXIMIZE,
+      MF_BYCOMMAND | MF_ENABLED);
+    EnableMenuItem(sysmenu, SC_MOVE,
+      MF_BYCOMMAND | MF_ENABLED);
+  }
+
+SetMenuDefaultItem(sysmenu, isWindowMaximized(hWnd) ? SC_RESTORE : SC_MAXIMIZE, false);
+
+  int id = TrackPopupMenu(sysmenu, TPM_RIGHTBUTTON | TPM_LEFTBUTTON | TPM_RETURNCMD, x, y, 0, hWnd, NULL);
+
+  switch(id) {
+    case SC_CLOSE: {
+      ShowWindow(hWnd, SW_HIDE);
+      break;
+    }
+    case SC_MAXIMIZE: {
+      ShowWindow(hWnd, SW_MAXIMIZE);
+      break;
+    }
+    case SC_MINIMIZE: {
+      ShowWindow(hWnd, SW_MINIMIZE);
+      break;
+    }
+    case SC_RESTORE: {
+      ShowWindow(hWnd, SW_RESTORE);
+      break;
+    }
+    case SC_MOVE: {
+      PostMessage(hWnd, WM_SYSCOMMAND, SC_MOVE, 0);
+      break;
+    }
+    case SC_SIZE: {
+      PostMessage(hWnd, WM_SYSCOMMAND, SC_SIZE, 0);
+      break;
+    }
+  }
+}
+
 // static
 LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
                                             UINT message,
@@ -844,15 +903,19 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
 
       switch(wParam) {
         case HTCAPTION: {
-          HMENU sysmenu = GetSystemMenu(hWnd, false);
-
-          TrackPopupMenu(sysmenu, TPM_RIGHTBUTTON | TPM_LEFTBUTTON | TPM_RETURNCMD, mx, my, 0, hWnd, NULL);
-          // TODO Implement
+          ShowSystemMenu(hWnd, mx, my);
           break;
         }
       }
-
-
+      break;
+    }
+    case WM_SYSCOMMAND: {
+      if(wParam == SC_KEYMENU) {
+        RECT pos;
+        GetWindowRect(hWnd, &pos);
+        ShowSystemMenu(hWnd, pos.left, pos.top);
+        return false;
+      }
       break;
     }
     case WM_CEFVPN: {
@@ -1546,7 +1609,7 @@ if(::PtInRect(&MaxBtn, point)) {
     RECT rc; GetClientRect(hWnd, &rc); 
     HBRUSH brush = CreateSolidBrush(RGB(31, 36, 41));
     FillRect(hdc, &rc, brush); 
-    DeleteObject(brush); // Free the created brush: see note below!
+    DeleteObject(brush);
     return TRUE;
   }
   return CallWindowProc(hParentWndProc, hWnd, message, wParam, lParam);

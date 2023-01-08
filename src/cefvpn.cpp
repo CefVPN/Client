@@ -70,6 +70,7 @@ void cefvpn::ovpn::connect()
 
     config.content = mc.profileContent;
     config.dco = false;
+    config.allowLocalDnsResolvers = 1;
 
     Client client;
 
