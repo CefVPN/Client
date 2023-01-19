@@ -9,6 +9,14 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CEF_ROOT ${PROJECT_SOURCE_DIR})
 include("FindCEF")
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CONFIG "Debug")
+    set(COMPILE_DEF -D_NDEBUG)
+else()
+    set(CONFIG "Release")
+    set(COMPILE_DEF -DNDEBUG)
+endif()
+
 #Source Files...
 set(CEFCLIENT_BROWSER_SRCS
     # shared_sources_browser
@@ -282,6 +290,7 @@ set(CEF_DEFS
     -DCEF_USE_SANDBOX
     -DCEF_USE_ATL   
     -DOS_POSIX
+    ${COMPILE_DEF}
 )
 
 set(OPENVPN3_DEP_LIBS
@@ -329,7 +338,7 @@ if(OS_LINUX)
 
     SET_EXECUTABLE_TARGET_PROPERTIES(${PROJECT_NAME})
     target_link_libraries(${PROJECT_NAME} 
-        ${CEF_BIN_ROOT}/Debug/libcef.so
+        ${CEF_BIN_ROOT}/${CONFIG}/libcef.so
         ${CEF_LIBCEF_DLL_LIB}/libcef_dll_wrapper.a
         "GL" 
         ${CEF_STANDARD_LIBS}
@@ -338,20 +347,20 @@ if(OS_LINUX)
     # Set rpath so that libraries can be placed next to the executable.
     set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
     set_target_properties(${PROJECT_NAME} PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
-    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/Debug)
+    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CONFIG})
 
     # We don't call deprecated GTK functions, and they can cause build failures, so disable them.
     add_definitions("-DGTK_DISABLE_DEPRECATED")
 
     # Copy CEF binary and resource files to the target output directory.
-    COPY_FILES("${PROJECT_NAME}" "${CEF_BINARY_FILES}" "${CEF_BIN_ROOT}/Debug" "${PROJECT_SOURCE_DIR}/bin/Debug")
-    COPY_FILES("${PROJECT_NAME}" "${CEF_RESOURCE_FILES}" "${CEF_BIN_ROOT}/Resources" "${PROJECT_SOURCE_DIR}/bin/Debug")
+    COPY_FILES("${PROJECT_NAME}" "${CEF_BINARY_FILES}" "${CEF_BIN_ROOT}/${CONFIG}" "${PROJECT_SOURCE_DIR}/bin/${CONFIG}")
+    COPY_FILES("${PROJECT_NAME}" "${CEF_RESOURCE_FILES}" "${CEF_BIN_ROOT}/Resources" "${PROJECT_SOURCE_DIR}/bin/${CONFIG}")
 
     # Copy cefclient resource files to the target output directory.
-    COPY_FILES("${PROJECT_NAME}" "${CEFCLIENT_RESOURCES_SRCS}" "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/bin/Debug/cefclient_files")
+    COPY_FILES("${PROJECT_NAME}" "${CEFCLIENT_RESOURCES_SRCS}" "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/bin/${CONFIG}/cefclient_files")
 
     # Set SUID permissions on the chrome-sandbox target.
-    SET_LINUX_SUID_PERMISSIONS("${PROJECT_NAME}" "${PROJECT_SOURCE_DIR}/bin/Debug/chrome-sandbox")
+    SET_LINUX_SUID_PERMISSIONS("${PROJECT_NAME}" "${PROJECT_SOURCE_DIR}/bin/${Debug}/chrome-sandbox")
 endif()
 
 
@@ -368,7 +377,7 @@ if(OS_WINDOWS)
     find_path(TAP_WINDOWS6_INCLUDE_DIRS "tap-windows.h")
 
     add_definitions(
-        -DCMAKE_INTDIR="Debug"
+        -DCMAKE_INTDIR=${CONFIG}
         ${WINDOWS_DEFS}
         ${CEF_DEFS}
         ${OPENVPN3_DEFINES}
@@ -387,9 +396,9 @@ if(OS_WINDOWS)
 
 
     target_link_libraries(${PROJECT_NAME} PUBLIC
-        ${CEF_BIN_ROOT}/Debug/libcef.lib
-        ${CEF_LIBCEF_DLL_LIB}/Debug/libcef_dll_wrapper.lib
-        ${CEF_BIN_ROOT}/Debug/cef_sandbox.lib
+        ${CEF_BIN_ROOT}/${CONFIG}/libcef.lib
+        ${CEF_LIBCEF_DLL_LIB}/${CONFIG}/libcef_dll_wrapper.lib
+        ${CEF_BIN_ROOT}/${CONFIG}/cef_sandbox.lib
         Ws2_32.lib
         Dbghelp.lib
         Shlwapi.lib
@@ -431,9 +440,9 @@ if(OS_WINDOWS)
         POST_BUILD
         COMMAND "mt.exe" -nologo
                 -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.exe.manifest\" \"${CMAKE_CURRENT_SOURCE_DIR}/compatibility.manifest\"
-                -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/bin/Debug/${PROJECT_NAME}.exe"\;\#1
+                -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/bin/${CONFIG}/${PROJECT_NAME}.exe"\;\#1
         COMMENT "Adding manifest..."
     )
-    COPY_FILES("${PROJECT_NAME}" "${CEF_BINARY_FILES}" "${CEF_BIN_ROOT}/Debug" "${PROJECT_SOURCE_DIR}/bin/Debug")
-    COPY_FILES("${PROJECT_NAME}" "${CEF_RESOURCE_FILES}" "${CEF_BIN_ROOT}/Resources" "${PROJECT_SOURCE_DIR}/bin/Debug")
+    COPY_FILES("${PROJECT_NAME}" "${CEF_BINARY_FILES}" "${CEF_BIN_ROOT}/${CONFIG}" "${PROJECT_SOURCE_DIR}/bin/${CONFIG}")
+    COPY_FILES("${PROJECT_NAME}" "${CEF_RESOURCE_FILES}" "${CEF_BIN_ROOT}/Resources" "${PROJECT_SOURCE_DIR}/bin/${CONFIG}")
 endif()

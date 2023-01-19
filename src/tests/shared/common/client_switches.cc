@@ -52,6 +52,10 @@ const char kHideChromeStatusBubble[] = "hide-chrome-status-bubble";
 const char kUseDefaultPopup[] = "use-default-popup";
 const char kUseClientDialogs[] = "use-client-dialogs";
 const char kUseTestHttpServer[] = "use-test-http-server";
+// Squirrel Args
+const char kSquirrelInstall[] = "squirrel-install";
+const char kSquirrelFirstRun[] = "squirrel-firstrun";
+
 
 }  // namespace switches
 }  // namespace client

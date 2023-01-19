@@ -377,9 +377,21 @@ void RootWindowWin::CreateRootWindow(const CefBrowserSettings& settings,
 
   browser_settings_ = settings;
 
+      // Display The Window if it Already is Running, without Creating another Instance.
+    // https://stackoverflow.com/a/33531179/17882108
+    HANDLE m_singleInstanceMutex = CreateMutex(NULL, TRUE, L"CefVPN");
+    if (m_singleInstanceMutex == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
+        HWND existingApp = FindWindow(L"CefVPN", window_class.c_str()); //
+        if (existingApp) SetForegroundWindow(existingApp);
+        if (existingApp) ShowWindow(existingApp, SW_RESTORE);
+        if (existingApp) ShowWindow(existingApp, SW_SHOW);
+    } else {
+      CreateWindowEx(dwExStyle, window_class.c_str(), window_title.c_str(), dwStyle,
+               x, y, 1300, 800, nullptr, nullptr, hInstance, this);
+    }
+
   // Create the main window initially hidden.
-  CreateWindowEx(dwExStyle, window_class.c_str(), window_title.c_str(), dwStyle,
-                 x, y, 1300, 800, nullptr, nullptr, hInstance, this);
+
   CHECK(hwnd_);
 
     BOOL value = TRUE;
@@ -418,7 +430,7 @@ void RootWindowWin::RegisterRootClass(HINSTANCE hInstance,
   WNDCLASSEX wcex;
 
   wcex.cbSize = sizeof(WNDCLASSEX);
-
+  wcex.lpszClassName = L"CefVPN";
   wcex.style = CS_HREDRAW | CS_VREDRAW;
   wcex.lpfnWndProc = RootWndProc;
   wcex.cbClsExtra = 0;
@@ -553,11 +565,23 @@ NOTIFYICONDATA nid = {};
 #define WM_CEFVPN (WM_USER + 1)
 #define ID_DISPLAY_APP_LYCF 103
 #define ID_LYCF_CLOSE 104
+#define ID_CUSTOM_BUTTON 105
 bool NotifyCon = true;
 static bool MaximizeButtonHovered;
 
+static bool isCustomMenu = true;
+
+static bool Notif_added = false;
+
 void ShowSystemMenu(HWND hWnd, int x, int y) {
     HMENU sysmenu = GetSystemMenu(hWnd, false);
+
+    if(isCustomMenu)
+    {
+      InsertMenu(sysmenu, SC_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CUSTOM_BUTTON, L"Quit");
+      InsertMenu(sysmenu, SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, NULL, 0);
+      isCustomMenu = false;
+    }
 
     if(isWindowMaximized(hWnd))
     {
@@ -572,18 +596,18 @@ void ShowSystemMenu(HWND hWnd, int x, int y) {
       MF_BYCOMMAND | MF_ENABLED);
 
     } else {
-      EnableMenuItem(sysmenu, SC_RESTORE,
-        MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-
     EnableMenuItem(sysmenu, SC_SIZE,
       MF_BYCOMMAND | MF_ENABLED);
     EnableMenuItem(sysmenu, SC_MAXIMIZE,
       MF_BYCOMMAND | MF_ENABLED);
     EnableMenuItem(sysmenu, SC_MOVE,
       MF_BYCOMMAND | MF_ENABLED);
+
+    EnableMenuItem(sysmenu, SC_RESTORE,
+      MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
   }
 
-SetMenuDefaultItem(sysmenu, isWindowMaximized(hWnd) ? SC_RESTORE : SC_MAXIMIZE, false);
+  SetMenuDefaultItem(sysmenu, isWindowMaximized(hWnd) ? SC_RESTORE : SC_MAXIMIZE, false);
 
   int id = TrackPopupMenu(sysmenu, TPM_RIGHTBUTTON | TPM_LEFTBUTTON | TPM_RETURNCMD, x, y, 0, hWnd, NULL);
 
@@ -610,6 +634,22 @@ SetMenuDefaultItem(sysmenu, isWindowMaximized(hWnd) ? SC_RESTORE : SC_MAXIMIZE, 
     }
     case SC_SIZE: {
       PostMessage(hWnd, WM_SYSCOMMAND, SC_SIZE, 0);
+      break;
+    }
+    case ID_CUSTOM_BUTTON: {
+      nid.cbSize = sizeof(NOTIFYICONDATA);
+      nid.uID = 0;
+      nid.uFlags = NIF_INFO;
+      nid.dwInfoFlags = NIIF_INFO;
+      nid.uTimeout = 1000; // 1 second timeout
+      wcscpy_s(nid.szInfoTitle, L"CefVPN Status:");
+      wcscpy_s(nid.szInfo, L"CONNECTED!");
+      if(!Notif_added) {
+        Shell_NotifyIcon(NIM_ADD, &nid);
+        Notif_added = true;
+      } else {
+        Shell_NotifyIcon(NIM_MODIFY, &nid);
+      }
       break;
     }
   }
@@ -731,6 +771,9 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       if(hWnd)
           scaleFactor = GetWindowScaleFactor(hWnd);
 
+      // Custom titlebar Implementation
+      // https://github.com/grassator/win32-window-custom-titlebar/blob/fec586e8c51271e3f3d2c1e13bd0effbaae952b9/main.c#L217
+
       RECT* requested_client_rect = params->rgrc;
 
       requested_client_rect->right -= frame_x + padding;
@@ -740,10 +783,8 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       if(isWindowMaximized(hWnd))
       {
         requested_client_rect->top += padding + (4.9 * (int)scaleFactor);
-      } else {
-        requested_client_rect->top -= padding - (4.9 * (int)scaleFactor);
       }
-        
+
       return 0;
       break;
     }
@@ -894,7 +935,7 @@ LRESULT CALLBACK RootWindowWin::RootWndProc(HWND hWnd,
       break;
     }
     case WM_NCRBUTTONUP: {
-      int mx = (int)LOWORD(lParam);   
+      int mx = (int)LOWORD(lParam);
       int my = (int)HIWORD(lParam);
 
       POINT m_pt; m_pt.x = mx; m_pt.y = my;

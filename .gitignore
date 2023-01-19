@@ -8,3 +8,4 @@ package-lock.json
 vcpkg_installed/
 Backup/
 *.log
+*.aps

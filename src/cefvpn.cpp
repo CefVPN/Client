@@ -8,8 +8,6 @@
 
 std::string cefvpn::ovpn::state;
 
-class __declspec(uuid("9D0B8B92-4E1C-488e-A1E1-2331AFCE2CB5")) PrinterIcon;
-
 using namespace openvpn;
 
 class Client : public ClientAPI::OpenVPNClient
@@ -66,11 +64,11 @@ void cefvpn::ovpn::connect()
 
     OpenVPNClientHelper ovpn_helper;
 
-    mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/OP-v0iden.ovpn", true);
+    mc = ovpn_helper.merge_config("C:/Users/p0ison/Desktop/OVPN/OP-vertex-2.ovpn", true);
 
     config.content = mc.profileContent;
     config.dco = false;
-    config.allowLocalDnsResolvers = 1;
+    config.allowLocalDnsResolvers = false;
 
     Client client;
 
@@ -109,9 +107,14 @@ bool cefvpn::OS::Shell_Notify(std::wstring title, std::wstring message) {
 
     // Display a low ink balloon message. This is a warning, so show the appropriate system icon.
     NOTIFYICONDATAW nid = { };
-    nid.uFlags = NIF_INFO | NIF_GUID;
-    nid.guidItem = __uuidof(PrinterIcon);
-    nid.dwInfoFlags = NIIF_ERROR;
+    nid.uVersion = NOTIFYICON_VERSION_4;
+    nid.uID = 10456;
+    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_INFO | NIF_TIP | NIF_GUID;
+    nid.hWnd = GetParent(cef_browser->GetHost()->GetWindowHandle());
+    nid.uCallbackMessage = WM_USER + 2;
+    nid.uTimeout = 3000;
+    nid.dwInfoFlags = NIIF_INFO;
+    nid.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     wcscpy_s(nid.szInfoTitle, L"CefVPN Status:");
     wcscpy_s(nid.szInfo, L"CONNECTED!~");
     return Shell_NotifyIcon(NIM_MODIFY, &nid);

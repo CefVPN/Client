@@ -46,6 +46,9 @@ extern const char kHideChromeStatusBubble[];
 extern const char kUseDefaultPopup[];
 extern const char kUseClientDialogs[];
 extern const char kUseTestHttpServer[];
+// Squirrel Args
+extern const char kSquirrelInstall[];
+extern const char kSquirrelFirstRun[];
 
 }  // namespace switches
 }  // namespace client

@@ -8,7 +8,8 @@ module.exports = {
     extend: {
       colors: {
         main_dbg: "#21252B",
-        Sidebar_dbg: "#282C34"
+        Sidebar_dbg: "#282C34",
+        config_bg: "#292A2D"
       },
       transitionProperty: {
         'width': 'width',

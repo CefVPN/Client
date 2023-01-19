@@ -105,6 +105,12 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
   window_config->with_osr =
       settings.windowless_rendering_enabled ? true : false;
 
+  if(command_line->HasSwitch(switches::kSquirrelInstall))
+  {
+    
+    context->Shutdown();
+  }
+
   // Create the first window.
   context->GetRootWindowManager()->CreateRootWindow(std::move(window_config));
 
