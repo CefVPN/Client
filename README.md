@@ -1,6 +1,6 @@
 
 <div align=center>
-  <img src=https://user-images.githubusercontent.com/76495154/200121487-b5ae885f-2afd-42a1-acb6-31b5708c9343.png>
+  <img height=180 width=180 src=https://user-images.githubusercontent.com/76495154/200121487-b5ae885f-2afd-42a1-acb6-31b5708c9343.png>
 
 # CefVPN Client
 **A Chromium Embeded Framework Based VPN Client.**
