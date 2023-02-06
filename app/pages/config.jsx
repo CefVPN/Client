@@ -50,7 +50,7 @@ export default function Settings() {
             <h1 className="text-white text-lg mb-2 font-thin">Window Behavior</h1>
             <div className="shadow-md fonts flex-col container h-full bg-config_bg rounded-md">
               <div className="h-1/2 flex justify-between items-center border-b-gray-500  border-b-[1px] ">
-                <h2 className="ml-4 font-thin text-gray-200">Hitting 'X' Hides the Window to System Tray</h2>
+                <h2 className="ml-4 font-thin text-gray-200">Closing the Window Hides it to System Tray</h2>
                 <AntSwitch className="mr-5" />
               </div>
               <div className="h-1/2 flex justify-between font-thin text-gray-200 items-center">

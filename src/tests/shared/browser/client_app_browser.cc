@@ -44,6 +44,9 @@ void ClientAppBrowser::PopulateSettings(CefRefPtr<CefCommandLine> command_line,
 void ClientAppBrowser::OnBeforeCommandLineProcessing(
     const CefString& process_type,
     CefRefPtr<CefCommandLine> command_line) {
+
+      command_line->AppendSwitch("disable-pinch");
+
   // Pass additional command-line flags to the browser process.
   if (process_type.empty()) {
     // Pass additional command-line flags when off-screen rendering is enabled.

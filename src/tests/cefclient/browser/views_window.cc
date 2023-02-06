@@ -125,6 +125,16 @@ CefRefPtr<ViewsWindow> ViewsWindow::Create(
   // Create a new top-level Window. It will show itself after creation.
   CefWindow::CreateTopLevelWindow(views_window);
 
+  // Before we Show the window, Lets set the Style to Get Native Window Animations.
+  CefWindowHandle CefHwnd = browser_view->GetWindow()->GetWindowHandle();
+
+  LONG_PTR newStyle = 
+    WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+
+  SetWindowLongPtr(CefHwnd, GWL_STYLE, newStyle);
+
+  views_window->Show();
+
   return views_window;
 }
 
@@ -783,8 +793,8 @@ ViewsWindow::ViewsWindow(Delegate* delegate,
   CefRefPtr<CefCommandLine> command_line =
       CefCommandLine::GetGlobalCommandLine();
 
-  const bool hide_frame = command_line->HasSwitch(switches::kHideFrame);
-  const bool hide_overlays = command_line->HasSwitch(switches::kHideOverlays);
+  const bool hide_frame = 1; //command_line->HasSwitch(switches::kHideFrame);
+  const bool hide_overlays = 1; //command_line->HasSwitch(switches::kHideOverlays);
 
   // Without a window frame.
   frameless_ = hide_frame || delegate_->WithExtension();

@@ -187,9 +187,11 @@ set(CEFCLIENT_RESOURCES_SRCS
     src/tests/cefclient/resources/binding.html
     src/tests/cefclient/resources/dialogs.html
     src/tests/cefclient/resources/draggable.html
+    src/tests/cefclient/resources/splash.html
     src/tests/cefclient/resources/ipc_performance.html
     src/tests/cefclient/resources/localstorage.html
     src/tests/cefclient/resources/logo.png
+    src/tests/cefclient/resources/CefVPN.png
     src/tests/cefclient/resources/media_router.html
     src/tests/cefclient/resources/menu_icon.1x.png
     src/tests/cefclient/resources/menu_icon.2x.png
@@ -314,6 +316,7 @@ if(OS_LINUX)
         ${CEFCLIENT_RENDERER_SRCS}
         ${CEFCLIENT_RESOURCES_SRCS}
         ${CEFCLIENT_LINUX_SRCS}
+        ${CEFCLIENT_RESOURCES_SRCS}
     )
 
     # Find required libraries and update compiler/linker variables.

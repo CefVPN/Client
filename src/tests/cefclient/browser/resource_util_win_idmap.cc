@@ -16,6 +16,8 @@ int GetResourceId(const char* resource_name) {
   } resource_map[] = {{"binding.html", IDS_BINDING_HTML},
                       {"dialogs.html", IDS_DIALOGS_HTML},
                       {"draggable.html", IDS_DRAGGABLE_HTML},
+                      {"splash.html", IDS_SPLASH_SCREEN_HTML},
+                      {"CefVPN.png", IDS_CEFVPN_LOGO_PNG},
                       {"extensions/set_page_color/icon.png",
                        IDS_EXTENSIONS_SET_PAGE_COLOR_ICON_PNG},
                       {"extensions/set_page_color/manifest.json",

@@ -75,6 +75,8 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
   settings.multi_threaded_message_loop = 1;
   settings.command_line_args_disabled = 1;
 
+  settings.background_color = CefColorSetARGB(0xFF, 31, 36, 41);
+
 #if !defined(CEF_USE_SANDBOX)
   settings.no_sandbox = true;
 #endif
@@ -104,6 +106,9 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
       //!command_line->HasSwitch(switches::kHideControls);
   window_config->with_osr =
       settings.windowless_rendering_enabled ? true : false;
+
+  window_config->initially_hidden = 
+      command_line->HasSwitch(switches::kUseViews);
 
   if(command_line->HasSwitch(switches::kSquirrelInstall))
   {

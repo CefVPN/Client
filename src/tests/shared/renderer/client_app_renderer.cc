@@ -16,6 +16,9 @@ void ClientAppRenderer::OnWebKitInitialized() {
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnWebKitInitialized(this);
+
+
+
 }
 
 void ClientAppRenderer::OnBrowserCreated(
@@ -24,6 +27,7 @@ void ClientAppRenderer::OnBrowserCreated(
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnBrowserCreated(this, browser, extra_info);
+
 }
 
 void ClientAppRenderer::OnBrowserDestroyed(CefRefPtr<CefBrowser> browser) {

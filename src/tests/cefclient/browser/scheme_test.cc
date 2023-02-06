@@ -72,6 +72,18 @@ class ClientSchemeHandler : public CefResourceHandler {
         // Set the resulting mime type
         mime_type_ = "image/png";
       }
+    } else if(strstr(url.c_str(), "splash.html") != nullptr) {
+      if(LoadBinaryResource("splash.html", data_)) {
+        handled = true;
+
+        mime_type_ = "text/html";
+      }
+    } else if(strstr(url.c_str(), "CefVPN.png") != nullptr) {
+      if (LoadBinaryResource("CefVPN.png", data_)) {
+        handled = true;
+
+        mime_type_ = "image/png";
+      }
     }
 
     return handled;
