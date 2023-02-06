@@ -12,9 +12,11 @@ include("FindCEF")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CONFIG "Debug")
     set(COMPILE_DEF -D_NDEBUG)
+    set(WIN_CONFIG "")
 else()
     set(CONFIG "Release")
     set(COMPILE_DEF -DNDEBUG)
+    set(WIN_CONFIG "WIN32")
 endif()
 
 #Source Files...
@@ -384,7 +386,7 @@ if(OS_WINDOWS)
         -DVCPKG_MANIFEST_INSTALL=ON
     )
 
-    add_executable(${PROJECT_NAME} ${SRC_FILES} ${CEFCLIENT_SRCS})
+    add_executable(${PROJECT_NAME} ${WIN_CONFIG} ${SRC_FILES} ${CEFCLIENT_SRCS})
 
     target_include_directories(${PROJECT_NAME} PUBLIC
         ${PROJECT_SOURCE_DIR}/include/cef/

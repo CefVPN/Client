@@ -3,6 +3,7 @@
 // can be found in the LICENSE file.
 
 #include <windows.h>
+#include <WinBase.h>
 
 #include <memory>
 
@@ -105,6 +106,8 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
   window_config->with_osr =
       settings.windowless_rendering_enabled ? true : false;
 
+  window_config->initially_hidden = command_line->HasSwitch(switches::kUseViews);
+
   if(command_line->HasSwitch(switches::kSquirrelInstall))
   {
     
@@ -132,10 +135,17 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
 }  // namespace client
 
 // Program entry point function.
+#ifdef _DEBUG
 int main(HINSTANCE hInstance,
                       HINSTANCE hPrevInstance,
                       LPTSTR lpCmdLine,
                       int nCmdShow) {
+#else
+int WINAPI wWinMain(HINSTANCE hInstance,
+                      HINSTANCE hPrevInstance,
+                      LPTSTR lpCmdLine,
+                      int nCmdShow) {
+#endif
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
   return client::RunMain(hInstance, nCmdShow);
