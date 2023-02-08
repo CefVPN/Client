@@ -22,6 +22,7 @@
 #include "include/cef_ssl_status.h"
 #include "include/cef_x509_certificate.h"
 #include "include/wrapper/cef_closure_task.h"
+#include "include/views/cef_browser_view.h"
 #include "tests/cefclient/browser/main_context.h"
 #include "tests/cefclient/browser/root_window_manager.h"
 #include "tests/cefclient/browser/test_runner.h"
@@ -442,6 +443,10 @@ bool ClientHandler::OnProcessMessageReceived(
 
   CefWindowHandle hwnd = GetParent(browser->GetHost()->GetWindowHandle());
 
+  CefRefPtr<CefBrowserView> browser_view = CefBrowserView::GetForBrowser(browser);
+
+  CefRefPtr<CefWindow> window = browser_view->GetWindow();
+
   if(message->GetName() == "str_cr")
   {
     std::cout << "[CefVPN:EXEC: CONNECT]\n";
@@ -464,13 +469,21 @@ bool ClientHandler::OnProcessMessageReceived(
     std::thread d(cefvpn::ovpn::disconnect);
     d.detach();
   } else if(message->GetName() == "min_wnd") {
-    ShowWindow(hwnd, SW_MINIMIZE);
+    //ShowWindow(hwnd, SW_MINIMIZE);
+    window->Minimize();
   } else if(message->GetName() == "max_wnd") {
-    ShowWindow(hwnd, isWindowMaximized(hwnd) ? SW_NORMAL : SW_MAXIMIZE);
+    //ShowWindow(hwnd, isWindowMaximized(hwnd) ? SW_NORMAL : SW_MAXIMIZE);
+
+    window->IsMaximized() ? window->Restore() : window->Maximize();
+
   } else if(message->GetName() == "hide_wnd") {
-    ShowWindow(hwnd, SW_HIDE);
+    //ShowWindow(hwnd, SW_HIDE);
+
+    window->Close();
+
   } else if(message->GetName() == "OnSnapLayouts:1") {
     ClientHandler::NotifyMaximizeHover(true);
+
   } else if(message->GetName() == "OnSnapLayouts:0") {
     ClientHandler::NotifyMaximizeHover(false);
   }
