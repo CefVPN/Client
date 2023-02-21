@@ -64,7 +64,7 @@ void cefvpn::ovpn::connect()
 
     OpenVPNClientHelper ovpn_helper;
 
-    mc = ovpn_helper.merge_config("C:/Users/p0ison/Desktop/OVPN/OP-vertex-2.ovpn", true);
+    mc = ovpn_helper.merge_config("C:/Users/p0ison/Desktop/cefvpn-ovpn/OP-p0ison.ovpn", true);
 
     config.content = mc.profileContent;
     config.dco = false;
