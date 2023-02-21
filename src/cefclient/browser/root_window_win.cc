@@ -19,7 +19,7 @@
 #include "shared/browser/main_message_loop.h"
 #include "shared/browser/util_win.h"
 #include "shared/common/client_switches.h"
-#include "cef_helper.h"
+#include "cefvpn/cef_helper.h"
 
 #include <shellapi.h>
 #include <dwmapi.h>

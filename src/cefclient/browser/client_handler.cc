@@ -34,8 +34,8 @@
 
 #if defined(OS_WIN)
 // ovpn includes.
-#include "cefvpn.hpp"
-#include "cef_helper.h"
+#include "cefvpn/cefvpn.hpp"
+#include "cefvpn/cef_helper.h"
 #endif
 
 

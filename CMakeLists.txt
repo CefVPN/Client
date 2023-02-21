@@ -152,7 +152,6 @@ set(CEFCLIENT_WINDOWS_SRCS
     src/cefclient/browser/temp_window_win.h
     src/cefclient/browser/window_test_runner_win.cc
     src/cefclient/browser/window_test_runner_win.h
-    src/cefclient_win.cc
     src/cefclient/resources/win/cefclient.rc
 )
 
@@ -179,7 +178,7 @@ set(CEFCLIENT_LINUX_SRCS
     src/cefclient/browser/util_gtk.h
     src/cefclient/browser/window_test_runner_gtk.cc
     src/cefclient/browser/window_test_runner_gtk.h
-    src/cefclient_gtk.cc
+    src/CefVPN/cefclient_gtk.cc
 )
 
 set(CEFCLIENT_RESOURCES_SRCS
@@ -235,10 +234,10 @@ set(CEF_LIBCEF_DLL_LIB ${CEF_ROOT}/build/libcef_dll_wrapper)
 set(VCPKG_PATH ${PROJECT_SOURCE_DIR}/bin/vcpkg_installed/${VCPKG_TARGET_TRIPLET})
 
 set(OPENVPN3_SRCS
-    src/ovpncli.hpp
-    src/ovpncli.cpp
-    src/cefvpn.hpp
-    src/cefvpn.cpp
+    src/cefvpn/ovpncli.hpp
+    src/cefvpn/ovpncli.cpp
+    src/cefvpn/cefvpn.hpp
+    src/cefvpn/cefvpn.cpp
 )
 
 set(CEFCLIENT_SRCS
@@ -249,9 +248,9 @@ set(CEFCLIENT_SRCS
     ${OPENVPN3_SRCS}
 )
 
-set(SRC_FILES
-    src/cefclient_win.cc
-    src/cef_helper.h
+set(WIN_SRC_FILES
+    src/cefvpn/cefclient_win.cc
+    src/cefvpn/cef_helper.h
     ${CEFCLIENT_SRCS}
 )
 
@@ -387,7 +386,7 @@ if(OS_WINDOWS)
         -DVCPKG_MANIFEST_INSTALL=ON
     )
 
-    add_executable(${PROJECT_NAME} ${SRC_FILES} ${CEFCLIENT_SRCS})
+    add_executable(${PROJECT_NAME} ${WIN_SRC_FILES} ${CEFCLIENT_SRCS})
 
     target_include_directories(${PROJECT_NAME} PUBLIC
         ${PROJECT_SOURCE_DIR}/include/cef/
