@@ -19,6 +19,9 @@
 #include "shared/common/client_switches.h"
 #include "shared/renderer/client_app_renderer.h"
 
+#include "cefclient/browser/resource.h"
+#include "shared/browser/util_win.h"
+
 // When generating projects with CMake the CEF_USE_SANDBOX value will be defined
 // automatically if using the required compiler version. Pass -DUSE_SANDBOX=OFF
 // to the CMake command-line to disable use of the sandbox.
@@ -33,6 +36,20 @@
 
 namespace client {
 namespace {
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
 
 int RunMain(HINSTANCE hInstance, int nCmdShow) {
   // Enable High-DPI support on Windows 7 or newer.
@@ -107,8 +124,9 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
   window_config->with_osr =
       settings.windowless_rendering_enabled ? true : false;
 
-  window_config->initially_hidden = 
-      command_line->HasSwitch(switches::kUseViews);
+  window_config->initially_hidden = true;
+
+  window_config->bounds = CefRect(0, 0, 900, 600);
 
   if(command_line->HasSwitch(switches::kSquirrelInstall))
   {
@@ -116,28 +134,40 @@ int RunMain(HINSTANCE hInstance, int nCmdShow) {
     context->Shutdown();
   }
 
-  // Create the first window.
-  context->GetRootWindowManager()->CreateRootWindow(std::move(window_config));
+  const std::wstring& window_class = GetResourceString(IDC_CEFCLIENT);
 
-  // Run the message loop. This will block until Quit() is called by the
-  // RootWindowManager after all windows have been destroyed.
-  int result = message_loop->Run();
+  HANDLE m_singleInstanceMutex = CreateMutex(NULL, TRUE, L"CefVPN");
+  if (m_singleInstanceMutex == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
+      HWND existingApp = FindWindow(L"CefVPN", window_class.c_str()); //
+      if (existingApp) SetForegroundWindow(existingApp);
+      if (existingApp) ShowWindow(existingApp, SW_RESTORE);
+      if (existingApp) ShowWindow(existingApp, SW_SHOW);
+  } else {
 
-  // Shut down CEF.
-  context->Shutdown();
+    // Create the first window.
+    context->GetRootWindowManager()->CreateRootWindow(std::move(window_config));
 
-  // Release objects in reverse order of creation.
-  message_loop.reset();
-  context.reset();
+    // Run the message loop. This will block until Quit() is called by the
+    // RootWindowManager after all windows have been destroyed.
+    int result = message_loop->Run();
 
-  return result;
+    // Shut down CEF.
+    context->Shutdown();
+
+    // Release objects in reverse order of creation.
+    message_loop.reset();
+    context.reset();
+
+    return result;
+  }
+  return 0;
 }
 
 }  // namespace
 }  // namespace client
 
 // Program entry point function.
-int main(HINSTANCE hInstance,
+int wWinMain(HINSTANCE hInstance,
                       HINSTANCE hPrevInstance,
                       LPTSTR lpCmdLine,
                       int nCmdShow) {
@@ -145,3 +175,4 @@ int main(HINSTANCE hInstance,
   UNREFERENCED_PARAMETER(lpCmdLine);
   return client::RunMain(hInstance, nCmdShow);
 }
+

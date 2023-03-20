@@ -12,6 +12,8 @@
 #include "cefclient/browser/client_handler.h"
 #include "cefclient/browser/root_window.h"
 #include "cefclient/browser/views_window.h"
+#include "resource.h"
+#include "shared/browser/util_win.h"
 
 namespace client {
 
@@ -67,6 +69,7 @@ class RootWindowViews : public RootWindow,
                              base::OnceClosure close_callback) override;
   void OnTest(int test_id) override;
   void OnExit() override;
+  void SetWndProc(HWND handle);
 
  protected:
   // ClientHandler::Delegate methods:

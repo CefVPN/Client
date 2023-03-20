@@ -64,7 +64,7 @@ void cefvpn::ovpn::connect()
 
     OpenVPNClientHelper ovpn_helper;
 
-    mc = ovpn_helper.merge_config("C:/Users/p0ison/Desktop/cefvpn-ovpn/OP-p0ison.ovpn", true);
+    mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/ovpn-profiles/OP-p0ison.ovpn", true);
 
     config.content = mc.profileContent;
     config.dco = false;
@@ -107,15 +107,12 @@ bool cefvpn::OS::Shell_Notify(std::wstring title, std::wstring message) {
 
     // Display a low ink balloon message. This is a warning, so show the appropriate system icon.
     NOTIFYICONDATAW nid = { };
-    nid.uVersion = NOTIFYICON_VERSION_4;
-    nid.uID = 10456;
-    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_INFO | NIF_TIP | NIF_GUID;
-    nid.hWnd = GetParent(cef_browser->GetHost()->GetWindowHandle());
-    nid.uCallbackMessage = WM_USER + 2;
-    nid.uTimeout = 3000;
-    nid.dwInfoFlags = NIIF_INFO;
-    nid.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-    wcscpy_s(nid.szInfoTitle, L"CefVPN Status:");
-    wcscpy_s(nid.szInfo, L"CONNECTED!~");
-    return Shell_NotifyIcon(NIM_MODIFY, &nid);
+      nid.cbSize = sizeof(NOTIFYICONDATA);
+      nid.uID = 0;
+      nid.uFlags = NIF_INFO;
+      nid.dwInfoFlags = NIIF_INFO;
+      nid.uTimeout = 1000; // 1 second timeout
+      wcscpy_s(nid.szInfoTitle, L"CefVPN Status:");
+      wcscpy_s(nid.szInfo, L"CONNECTED!");
+    return Shell_NotifyIcon(NIM_ADD, &nid);
 }

@@ -13,7 +13,7 @@ export const SidebarData = [
     {
         title: "Import Profile",
         icon: <IconFileImport />,
-        link: "/import"
+        link: ""
     },
     {
         title: "Settings",

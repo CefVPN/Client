@@ -16,7 +16,7 @@ namespace client {
 namespace {
 
 // The default URL to load in a browser window.
-const char kDefaultUrl[] = "cefvpn://client/index";
+const char kDefaultUrl[] = "cefvpn://client/splash";
 
 // Returns the ARGB value for |color|.
 cef_color_t ParseColor(const std::string& color) {
@@ -98,7 +98,7 @@ MainContextImpl::MainContextImpl(CefRefPtr<CefCommandLine> command_line,
   }
 
   // Whether the Views framework will be used.
-  use_views_ = command_line_->HasSwitch(switches::kUseViews);
+  use_views_ = true; //command_line_->HasSwitch(switches::kUseViews);
 
   if (use_windowless_rendering_ && use_views_) {
     LOG(ERROR)

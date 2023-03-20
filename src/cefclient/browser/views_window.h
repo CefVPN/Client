@@ -180,6 +180,9 @@ class ViewsWindow : public CefBrowserViewDelegate,
                              int command_id,
                              cef_event_flags_t event_flags) override;
 
+  // Set Window Message Handler:
+  void SetWndProcHanlder(HWND hWnd);
+
  private:
   // |delegate| is guaranteed to outlive this object.
   // |browser_view| may be nullptr, in which case SetBrowserView() will be

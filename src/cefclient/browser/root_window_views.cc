@@ -497,6 +497,8 @@ void RootWindowViews::InitOnUIThread(
                                 settings, startup_url, request_context));
 }
 
+const std::wstring& window_class = GetResourceString(IDC_CEFCLIENT);
+
 void RootWindowViews::CreateViewsWindow(
     const CefBrowserSettings& settings,
     const std::string& startup_url,
@@ -515,7 +517,7 @@ void RootWindowViews::CreateViewsWindow(
 
   // Create the ViewsWindow. It will show itself after creation.
   ViewsWindow::Create(this, client_handler_, startup_url, settings,
-                      request_context);
+                    request_context);
 }
 
 void RootWindowViews::NotifyViewsWindowDestroyed() {

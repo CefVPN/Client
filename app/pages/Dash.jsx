@@ -5,6 +5,8 @@ import { alpha, createTheme, ThemeProvider } from '@mui/material/styles';
 import { Handler, Disconnect, isFullscreen } from '../components/Handler'
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import "country-flag-icons/3x2/flags.css";
+import Modal from 'react-modal'
+import ImportProfile from '../components/ImportProfile';
 
 const theme = createTheme({
   status: {
@@ -63,6 +65,9 @@ export default function Dash() {
 
   const [isHovering, setIsHovering] = useState(false);
 
+
+
+
   const handleMouseOver = () => {
     setIsHovering(true);
   };
@@ -90,7 +95,9 @@ export default function Dash() {
       setIsConnecting(!isConnecting)
   }  
   return (
+    
     <div className="text-white absolute h-screen w-screen pl-5">
+
       <div className="Power-btn w-full h-full flex justify-center items-center">
         <div className={`w-48 h-48 rounded-full cursor-pointer ${isConnected ? "bg-emerald-600" : "bg-blue-600"} opacity-95 justify-center items-center flex -mt-32`}
           onClick={() => Power()}
@@ -109,50 +116,12 @@ export default function Dash() {
             </div>
           </div>
         </div>
+        <div className='mr-120'>
+      </div>
       </div>
       <div className="loc-widget main ml-28 absolute bottom-5" onMouseOver={() => handleMouseOver} onMouseLeave={() => handleMouseOut}>
-          <Box
-          className='overflow-hidden duration-300'
-          sx={{
-            width: 300,
-            height: 120,
-            backgroundColor: "#282C34",
-            borderRadius: "12px",
-            boxShadow: 3,
-            ":hover": {
-              boxShadow: 5,
-              height: 300,
-              transition: "box-shadow height",
-            }
-          }}>
-            <h1 className="text-lg pt-5 pl-5 opacity-75">Virtual Location</h1>
-            <div className="inline-flex ml-4 mt-4">
-              <div className="relative mx-auto rounded-full w-12 h-12">
-                <div className={`flag:${position.cn} mx-auto rounded-full text-3xl`}></div>
-              </div>
-              <h2 className='justify-center pl-2 items-center'>{`${position.cy}, ${position.rg}`}</h2>
-            </div>
-            <div className={""}>
-              <ComposableMap className="flex" projectionConfig={{
-                center: [18, -20],
-                scale: 160,
-                height: 200,
-                width: 200
-              }}>
-                <Geographies geography={"/features.json"}>
-                {({ geographies }) =>
-                  geographies.map((geo) => (
-                    <Geography key={geo.rsmKey} geography={geo} fill="#4f525c" stroke='#4f525c' pointerEvents={"none"} />
-                  ))
-                }
-                </Geographies>
-                  <Marker coordinates={[position.y, position.x]}> 
-                    <circle r={6} fill="#3DED97" opacity={checked ? 1 : 0} />
-                    <circle r={60} fill="#1B76D2" opacity={checked ? 0.2 : 0} />
-                  </Marker>
-              </ComposableMap>
-            </div>
-          </Box>
+        </div>
+        <div className="test">
         </div>
     </div>
   )

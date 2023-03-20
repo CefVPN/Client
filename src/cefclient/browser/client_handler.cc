@@ -184,9 +184,10 @@ void LoadErrorPage(CefRefPtr<CefFrame> frame,
                    const std::string& failed_url,
                    cef_errorcode_t error_code,
                    const std::string& other_info) {
+  /*
   std::stringstream ss;
   ss << "<html><head><title>Page failed to load</title></head>"
-        "<body bgcolor=\"white\">"
+        "<body bgcolor=\"black\">"
         "<h3>Page failed to load.</h3>"
         "URL: <a href=\""
      << failed_url << "\">" << failed_url
@@ -198,6 +199,9 @@ void LoadErrorPage(CefRefPtr<CefFrame> frame,
 
   ss << "</body></html>";
   frame->LoadURL(test_runner::GetDataURI(ss.str(), "text/html"));
+  */
+ //frame->LoadURL("cefvpn://client/splash.html");
+
 }
 
 // Return HTML string with information about a certificate.

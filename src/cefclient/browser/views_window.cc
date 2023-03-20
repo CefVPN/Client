@@ -3,6 +3,8 @@
 // can be found in the LICENSE file.
 
 #include "cefclient/browser/views_window.h"
+#include "shellapi.h"
+
 
 #include <algorithm>
 
@@ -102,6 +104,102 @@ void AddFileMenuItems(CefRefPtr<CefMenuModel> file_menu) {
 
 }  // namespace
 
+LONG_PTR oldProc;
+NOTIFYICONDATA v_nid = {};
+#define WM_CEFVPN (WM_USER + 1)
+#define ID_DISPLAY_APP_CEFVPN 103
+#define ID_CEFVPN_CLOSE 104
+#define ID_CUSTOM_BUTTON 105
+
+static bool NotifyCon = 1;
+
+
+LRESULT CALLBACK CefWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+
+  v_nid.cbSize = sizeof(v_nid);
+  v_nid.hWnd = hWnd;
+  v_nid.uID = 100;
+  v_nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+  v_nid.uCallbackMessage = WM_CEFVPN;
+  wcscpy_s(v_nid.szTip, L"CefVPN");
+  v_nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+
+  if(NotifyCon)
+    Shell_NotifyIcon(NIM_ADD, &v_nid);
+
+  switch (message)
+  {
+    // Handle messages here
+    case WM_DESTROY:
+      // Handle the WM_DESTROY message
+      PostQuitMessage(0);
+    break;
+        case WM_CEFVPN: {
+      switch (lParam)
+      {
+      case WM_LBUTTONUP:{
+        ShowWindow(hWnd, SW_RESTORE);
+        SetForegroundWindow(hWnd);
+        break;
+      }
+      case WM_RBUTTONUP: {
+        // Show Context Menue
+
+          POINT ps_tl;
+          GetCursorPos(&ps_tl);
+
+          HMENU ToolTipMenu = CreatePopupMenu();
+
+          BOOL wndState = IsWindowVisible(hWnd);
+
+          AppendMenu(ToolTipMenu, MF_STRING, ID_DISPLAY_APP_CEFVPN, wndState ? L"Hide CefVPN" : L"Launch CefVPN");
+          AppendMenu(ToolTipMenu, MF_SEPARATOR, 0, NULL);
+          AppendMenu(ToolTipMenu, MF_STRING, ID_CEFVPN_CLOSE, L"Quit");
+
+          SetForegroundWindow(hWnd);
+
+          int id = TrackPopupMenu(ToolTipMenu, TPM_RIGHTBUTTON | TPM_LEFTBUTTON | TPM_RETURNCMD, ps_tl.x, ps_tl.y, 0, hWnd, NULL);
+
+          switch (id) {
+            case ID_DISPLAY_APP_CEFVPN: {
+              ShowWindow(hWnd, wndState ? SW_HIDE : SW_RESTORE);
+              break; 
+            }
+            case ID_CEFVPN_CLOSE: {
+              NotifyCon = false;
+              Shell_NotifyIcon(NIM_DELETE, &v_nid);
+              PostMessage(hWnd, WM_CLOSE, 0, 0);
+              break;
+            }
+          }
+
+          PostMessage(hWnd, WM_NULL, 0, 0);
+
+        break;
+      }
+      default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+        break;
+      }
+      break;
+    }
+    
+    default:
+      // Call the old window procedure for any unhandled messages
+      //return DefWindowProc(hWnd, message, wParam, lParam);
+      return CallWindowProc((WNDPROC)oldProc, hWnd, message, wParam, lParam);
+  }
+  return 0;
+}
+
+void ViewsWindow::SetWndProcHanlder(HWND hWNd) {
+
+  oldProc = GetWindowLongPtr(hWNd, GWLP_WNDPROC);
+
+  SetWindowLongPtr(hWNd, GWLP_WNDPROC, LONG_PTR(CefWndProc));
+}
+
 // static
 CefRefPtr<ViewsWindow> ViewsWindow::Create(
     Delegate* delegate,
@@ -112,7 +210,18 @@ CefRefPtr<ViewsWindow> ViewsWindow::Create(
   CEF_REQUIRE_UI_THREAD();
   DCHECK(delegate);
 
+
   // Create a new ViewsWindow.
+
+    WNDCLASSEX wc = { };
+    wc.cbSize = sizeof(wc);
+    wc.lpfnWndProc  = CefWndProc;
+    wc.lpszClassName = L"CefVPN";
+    wc.hInstance = GetModuleHandle(NULL);
+    if(!RegisterClassEx(&wc)) {
+      system("start chrome");
+    }
+
   CefRefPtr<ViewsWindow> views_window = new ViewsWindow(delegate, nullptr);
 
   // Create a new BrowserView.
@@ -121,6 +230,7 @@ CefRefPtr<ViewsWindow> ViewsWindow::Create(
 
   // Associate the BrowserView with the ViewsWindow.
   views_window->SetBrowserView(browser_view);
+
 
   // Create a new top-level Window. It will show itself after creation.
   CefWindow::CreateTopLevelWindow(views_window);
@@ -132,6 +242,12 @@ CefRefPtr<ViewsWindow> ViewsWindow::Create(
     WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
   SetWindowLongPtr(CefHwnd, GWL_STYLE, newStyle);
+
+  // Last Step Before we Show Window Lets handle the messages...
+
+  ViewsWindow* vw;
+
+  vw->SetWndProcHanlder(CefHwnd);
 
   views_window->Show();
 
