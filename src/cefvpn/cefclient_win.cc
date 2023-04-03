@@ -34,145 +34,121 @@
 #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-namespace client {
-namespace {
-
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+namespace client
 {
-    switch (uMsg)
+  namespace
+  {
+    int RunMain(HINSTANCE hInstance, int nCmdShow)
     {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
-    return 0;
-}
+      // Enable High-DPI support on Windows 7 or newer.
+      CefEnableHighDPISupport();
 
+      CefMainArgs main_args(hInstance);
 
-int RunMain(HINSTANCE hInstance, int nCmdShow) {
-  // Enable High-DPI support on Windows 7 or newer.
-  CefEnableHighDPISupport();
-
-  CefMainArgs main_args(hInstance);
-
-  void* sandbox_info = nullptr;
+      void *sandbox_info = nullptr;
 
 #if defined(CEF_USE_SANDBOX)
-  // Manage the life span of the sandbox information object. This is necessary
-  // for sandbox support on Windows. See cef_sandbox_win.h for complete details.
-  CefScopedSandboxInfo scoped_sandbox;
-  sandbox_info = scoped_sandbox.sandbox_info();
+      // Manage the life span of the sandbox information object. This is necessary
+      // for sandbox support on Windows. See cef_sandbox_win.h for complete details.
+      CefScopedSandboxInfo scoped_sandbox;
+      sandbox_info = scoped_sandbox.sandbox_info();
 #endif
 
-  // Parse command-line arguments.
-  CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
-  command_line->InitFromString(::GetCommandLineW());
+      // Parse command-line arguments.
+      CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
+      command_line->InitFromString(::GetCommandLineW());
 
-  // Create a ClientApp of the correct type.
-  CefRefPtr<CefApp> app;
-  ClientApp::ProcessType process_type = ClientApp::GetProcessType(command_line);
-  if (process_type == ClientApp::BrowserProcess)
-    app = new ClientAppBrowser();
-  else if (process_type == ClientApp::RendererProcess)
-    app = new ClientAppRenderer();
-  else if (process_type == ClientApp::OtherProcess)
-    app = new ClientAppOther();
+      // Create a ClientApp of the correct type.
+      CefRefPtr<CefApp> app;
+      ClientApp::ProcessType process_type = ClientApp::GetProcessType(command_line);
+      if (process_type == ClientApp::BrowserProcess)
+        app = new ClientAppBrowser();
+      else if (process_type == ClientApp::RendererProcess)
+        app = new ClientAppRenderer();
+      else if (process_type == ClientApp::OtherProcess)
+        app = new ClientAppOther();
 
-  // Execute the secondary process, if any.
-  int exit_code = CefExecuteProcess(main_args, app, sandbox_info);
-  if (exit_code >= 0)
-    return exit_code;
+      // Execute the secondary process, if any.
+      int exit_code = CefExecuteProcess(main_args, app, sandbox_info);
+      if (exit_code >= 0)
+        return exit_code;
 
-  // Create the main context object.
-  auto context = std::make_unique<MainContextImpl>(command_line, true);
+      // Create the main context object.
+      auto context = std::make_unique<MainContextImpl>(command_line, true);
 
-  CefSettings settings;
-  settings.multi_threaded_message_loop = 1;
-  settings.command_line_args_disabled = 1;
+      CefSettings settings;
+      settings.multi_threaded_message_loop = 1;
+      settings.command_line_args_disabled = 1;
 
-  settings.background_color = CefColorSetARGB(0xFF, 31, 36, 41);
+      settings.background_color = CefColorSetARGB(0xFF, 31, 36, 41);
 
 #if !defined(CEF_USE_SANDBOX)
-  settings.no_sandbox = true;
+      settings.no_sandbox = true;
 #endif
 
-  // Populate the settings based on command line arguments.
-  context->PopulateSettings(&settings);
+      // Populate the settings based on command line arguments.
+      context->PopulateSettings(&settings);
 
-  // Create the main message loop object.
-  std::unique_ptr<MainMessageLoop> message_loop;
-  if (settings.multi_threaded_message_loop)
-    message_loop.reset(new MainMessageLoopMultithreadedWin);
-  else if (settings.external_message_pump)
-    message_loop = MainMessageLoopExternalPump::Create();
-  else
-    message_loop.reset(new MainMessageLoopStd);
+      // Create the main message loop object.
+      std::unique_ptr<MainMessageLoop> message_loop;
+      if (settings.multi_threaded_message_loop)
+        message_loop.reset(new MainMessageLoopMultithreadedWin);
+      else if (settings.external_message_pump)
+        message_loop = MainMessageLoopExternalPump::Create();
+      else
+        message_loop.reset(new MainMessageLoopStd);
 
-  // Initialize CEF.
-  context->Initialize(main_args, settings, app, sandbox_info);
+      // Initialize CEF.
+      context->Initialize(main_args, settings, app, sandbox_info);
 
-  // Register scheme handlers.
-  test_runner::RegisterSchemeHandlers();
+      // Register scheme handlers.
+      test_runner::RegisterSchemeHandlers();
 
-  auto window_config = std::make_unique<RootWindowConfig>();
-  window_config->always_on_top =
-      command_line->HasSwitch(switches::kAlwaysOnTop);
-  window_config->with_controls = false;
-      //!command_line->HasSwitch(switches::kHideControls);
-  window_config->with_osr =
-      settings.windowless_rendering_enabled ? true : false;
+      auto window_config = std::make_unique<RootWindowConfig>();
+      window_config->always_on_top =
+          command_line->HasSwitch(switches::kAlwaysOnTop);
+      window_config->with_controls = false;
+      //! command_line->HasSwitch(switches::kHideControls);
+      window_config->with_osr =
+          settings.windowless_rendering_enabled ? true : false;
 
-  window_config->initially_hidden = true;
+      window_config->initially_hidden = true;
 
-  window_config->bounds = CefRect(0, 0, 900, 600);
+      window_config->bounds = CefRect(0, 0, 900, 600);
 
-  if(command_line->HasSwitch(switches::kSquirrelInstall))
-  {
-    
-    context->Shutdown();
-  }
+      if (command_line->HasSwitch(switches::kSquirrelInstall))
+      {
 
-  const std::wstring& window_class = GetResourceString(IDC_CEFCLIENT);
+        context->Shutdown();
+      }
 
-  HANDLE m_singleInstanceMutex = CreateMutex(NULL, TRUE, L"CefVPN");
-  if (m_singleInstanceMutex == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
-      HWND existingApp = FindWindow(L"CefVPN", window_class.c_str()); //
-      if (existingApp) SetForegroundWindow(existingApp);
-      if (existingApp) ShowWindow(existingApp, SW_RESTORE);
-      if (existingApp) ShowWindow(existingApp, SW_SHOW);
-  } else {
+      // Create the first window.
+      context->GetRootWindowManager()->CreateRootWindow(std::move(window_config));
 
-    // Create the first window.
-    context->GetRootWindowManager()->CreateRootWindow(std::move(window_config));
+      // Run the message loop. This will block until Quit() is called by the
+      // RootWindowManager after all windows have been destroyed.
+      int result = message_loop->Run();
 
-    // Run the message loop. This will block until Quit() is called by the
-    // RootWindowManager after all windows have been destroyed.
-    int result = message_loop->Run();
+      // Shut down CEF.
+      context->Shutdown();
 
-    // Shut down CEF.
-    context->Shutdown();
+      // Release objects in reverse order of creation.
+      message_loop.reset();
+      context.reset();
 
-    // Release objects in reverse order of creation.
-    message_loop.reset();
-    context.reset();
+      return result;
+    }
 
-    return result;
-  }
-  return 0;
-}
-
-}  // namespace
-}  // namespace client
+  } // namespace
+} // namespace client
 
 // Program entry point function.
-int wWinMain(HINSTANCE hInstance,
-                      HINSTANCE hPrevInstance,
-                      LPTSTR lpCmdLine,
-                      int nCmdShow) {
+int main(HINSTANCE hInstance,
+             HINSTANCE hPrevInstance,
+             LPTSTR lpCmdLine,
+             int nCmdShow)
+{
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
   return client::RunMain(hInstance, nCmdShow);
 }
-

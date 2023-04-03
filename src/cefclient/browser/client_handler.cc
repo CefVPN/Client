@@ -483,7 +483,9 @@ bool ClientHandler::OnProcessMessageReceived(
   } else if(message->GetName() == "hide_wnd") {
     //ShowWindow(hwnd, SW_HIDE);
 
-    window->Close();
+    window->Hide();
+
+    //window->Close();
 
   } else if(message->GetName() == "OnSnapLayouts:1") {
     ClientHandler::NotifyMaximizeHover(true);
