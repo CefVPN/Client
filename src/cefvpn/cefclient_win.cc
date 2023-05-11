@@ -22,6 +22,9 @@
 #include "cefclient/browser/resource.h"
 #include "shared/browser/util_win.h"
 
+#include <cefvpn/db/creds.hpp>
+#include <iostream>
+
 // When generating projects with CMake the CEF_USE_SANDBOX value will be defined
 // automatically if using the required compiler version. Pass -DUSE_SANDBOX=OFF
 // to the CMake command-line to disable use of the sandbox.
@@ -40,8 +43,13 @@ namespace client
   {
     int RunMain(HINSTANCE hInstance, int nCmdShow)
     {
-      // Enable High-DPI support on Windows 7 or newer.
-      CefEnableHighDPISupport();
+      // Initialize SQLite
+      cefdb cef_db;
+
+      //if(cef_db.CheckIfExist()) {
+        cef_db.CreateDB();
+        cef_db.CreateTable();
+      //}
 
       CefMainArgs main_args(hInstance);
 

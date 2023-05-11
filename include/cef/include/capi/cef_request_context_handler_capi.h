@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2023 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=e2a1abf4d73bb90fb077cc5642d7b95ac5c11c14$
+// $hash=b0b532a12106d960adc446b980affeee12b93ae3$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_REQUEST_CONTEXT_HANDLER_CAPI_H_
@@ -43,6 +43,7 @@
 #include "include/capi/cef_base_capi.h"
 #include "include/capi/cef_browser_capi.h"
 #include "include/capi/cef_frame_capi.h"
+#include "include/capi/cef_preference_capi.h"
 #include "include/capi/cef_request_capi.h"
 #include "include/capi/cef_resource_request_handler_capi.h"
 

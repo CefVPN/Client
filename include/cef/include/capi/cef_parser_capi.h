@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2023 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=a6cb0abd77320cfd9ddfa3f16ca0a6ff3987521a$
+// $hash=5d6dad4bfaeef0117d068b6e67a8da7490fe7c2d$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_PARSER_CAPI_H_
@@ -45,6 +45,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+///
+/// Combines specified |base_url| and |relative_url| into |resolved_url|.
+/// Returns false (0) if one of the URLs is NULL or invalid.
+///
+CEF_EXPORT int cef_resolve_url(const cef_string_t* base_url,
+                               const cef_string_t* relative_url,
+                               cef_string_t* resolved_url);
 
 ///
 /// Parse the specified |url| into its component parts. Returns false (0) if the

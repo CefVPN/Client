@@ -45,6 +45,7 @@ bool cefvpn::WinHelper::ShowSnapLayouts = false;
 bool cefvpn::ovpn::isConnected;
 bool cefvpn::ovpn::isConnecting;
 
+
 namespace client {
 
 #if defined(OS_WIN)
@@ -492,6 +493,18 @@ bool ClientHandler::OnProcessMessageReceived(
 
   } else if(message->GetName() == "OnSnapLayouts:0") {
     ClientHandler::NotifyMaximizeHover(false);
+  } else if(message->GetName() == "importProfile") {
+
+    CefRefPtr<CefListValue> arg_list = message->GetArgumentList();
+
+    if (arg_list->GetString(0) == "Profile_Content") {
+      /*
+      cefvpn::ovpn vpn;
+          vpn.content = arg_list->GetString(1);
+      */
+      cefvpn::ovpn::content = arg_list->GetString(1);
+      // std::cout << vpn.content;
+    }
   }
 
 #endif
@@ -759,9 +772,9 @@ bool ClientHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
 
   // Forbid dragging of URLs and files.
   if ((mask & DRAG_OPERATION_LINK) && !dragData->IsFragment()) {
-    test_runner::Alert(browser, "cefclient blocks dragging of URLs and files");
     return true;
   }
+
 
   return false;
 }
@@ -1020,22 +1033,6 @@ bool ClientHandler::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
   }
 
   return false;
-}
-
-bool ClientHandler::OnQuotaRequest(CefRefPtr<CefBrowser> browser,
-                                   const CefString& origin_url,
-                                   int64 new_size,
-                                   CefRefPtr<CefCallback> callback) {
-  CEF_REQUIRE_IO_THREAD();
-
-  static const int64 max_size = 1024 * 1024 * 20;  // 20mb.
-
-  // Grant the quota request if the size is reasonable.
-  if (new_size <= max_size)
-    callback->Continue();
-  else
-    callback->Cancel();
-  return true;
 }
 
 bool ClientHandler::OnCertificateError(CefRefPtr<CefBrowser> browser,

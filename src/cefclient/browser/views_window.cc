@@ -144,8 +144,7 @@ namespace client
       {
       case WM_LBUTTONUP:
       {
-        ShowWindow(hWnd, SW_RESTORE);
-        SetForegroundWindow(hWnd);
+        views_window->Show();
         break;
       }
       case WM_RBUTTONUP:
@@ -179,7 +178,8 @@ namespace client
         {
           NotifyCon = false;
           Shell_NotifyIcon(NIM_DELETE, &v_nid);
-          PostMessage(hWnd, WM_CLOSE, 0, 0);
+          //PostMessage(hWnd, WM_CLOSE, 0, 0);
+          views_window->Close(1);
           break;
         }
         }
@@ -227,10 +227,6 @@ namespace client
     wc.lpfnWndProc = CefWndProc;
     wc.lpszClassName = L"CefVPN";
     wc.hInstance = GetModuleHandle(NULL);
-    if (!RegisterClassEx(&wc))
-    {
-      system("start chrome");
-    }
 
     views_window = new ViewsWindow(delegate, nullptr);
 

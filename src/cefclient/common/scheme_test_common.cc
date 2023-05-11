@@ -11,7 +11,7 @@ namespace scheme_test {
 
 void RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) {
   registrar->AddCustomScheme(
-      "cefvpn", CEF_SCHEME_OPTION_STANDARD | CEF_SCHEME_OPTION_CORS_ENABLED | CEF_SCHEME_OPTION_FETCH_ENABLED);
+      "cefvpn", CEF_SCHEME_OPTION_STANDARD | CEF_SCHEME_OPTION_CORS_ENABLED | CEF_SCHEME_OPTION_FETCH_ENABLED | CEF_SCHEME_OPTION_SECURE);
 }
 
 }  // namespace scheme_test

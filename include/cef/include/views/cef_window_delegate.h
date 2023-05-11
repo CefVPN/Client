@@ -56,6 +56,12 @@ class CefWindowDelegate : public CefPanelDelegate {
   virtual void OnWindowCreated(CefRefPtr<CefWindow> window) {}
 
   ///
+  /// Called when |window| is closing.
+  ///
+  /*--cef()--*/
+  virtual void OnWindowClosing(CefRefPtr<CefWindow> window) {}
+
+  ///
   /// Called when |window| is destroyed. Release all references to |window| and
   /// do not attempt to execute any methods on |window| after this callback
   /// returns.
@@ -69,6 +75,14 @@ class CefWindowDelegate : public CefPanelDelegate {
   /*--cef()--*/
   virtual void OnWindowActivationChanged(CefRefPtr<CefWindow> window,
                                          bool active) {}
+
+  ///
+  /// Called when |window| bounds have changed. |new_bounds| will be in DIP
+  /// screen coordinates.
+  ///
+  /*--cef()--*/
+  virtual void OnWindowBoundsChanged(CefRefPtr<CefWindow> window,
+                                     const CefRect& new_bounds) {}
 
   ///
   /// Return the parent for |window| or NULL if the |window| does not have a
@@ -115,6 +129,29 @@ class CefWindowDelegate : public CefPanelDelegate {
   virtual bool IsFrameless(CefRefPtr<CefWindow> window) { return false; }
 
   ///
+  /// Return true if |window| should be created with standard window buttons
+  /// like close, minimize and zoom. This method is only supported on macOS.
+  ///
+  /*--cef()--*/
+  virtual bool WithStandardWindowButtons(CefRefPtr<CefWindow> window) {
+    return !IsFrameless(window);
+  }
+
+  ///
+  /// Return whether the titlebar height should be overridden,
+  /// and sets the height of the titlebar in |titlebar_height|.
+  /// On macOS, it can also be used to adjust the vertical position
+  /// of the traffic light buttons in frameless windows.
+  /// The buttons will be positioned halfway down the titlebar
+  /// at a height of |titlebar_height| / 2.
+  ///
+  /*--cef()--*/
+  virtual bool GetTitlebarHeight(CefRefPtr<CefWindow> window,
+                                 float* titlebar_height) {
+    return false;
+  }
+
+  ///
   /// Return true if |window| can be resized.
   ///
   /*--cef()--*/
@@ -159,6 +196,16 @@ class CefWindowDelegate : public CefPanelDelegate {
                           const CefKeyEvent& event) {
     return false;
   }
+
+  ///
+  /// Called when the |window| is transitioning to or from fullscreen mode. The
+  /// transition occurs in two stages, with |is_competed| set to false when the
+  /// transition starts and true when the transition completes.
+  /// This method is only supported on macOS.
+  ///
+  /*--cef()--*/
+  virtual void OnWindowFullscreenTransition(CefRefPtr<CefWindow> window,
+                                            bool is_completed) {}
 };
 
 #endif  // CEF_INCLUDE_VIEWS_CEF_WINDOW_DELEGATE_H_

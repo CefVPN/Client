@@ -16,6 +16,8 @@ private:
     virtual void event(const ClientAPI::Event &ev) override
     {
 
+        std::cout << ev.info;
+
         cefvpn::ovpn::isConnected = ev.name == "CONNECTED" ? true : false;
 
         if(cefvpn::ovpn::isConnected) {
@@ -51,7 +53,7 @@ private:
 };
 
 static Client *the_client = nullptr;
-
+std::string cefvpn::ovpn::content = "NULL";
 cefvpn::ovpn::~ovpn() {}
 
 void cefvpn::ovpn::connect()
@@ -64,9 +66,14 @@ void cefvpn::ovpn::connect()
 
     OpenVPNClientHelper ovpn_helper;
 
-    mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/ovpn-profiles/OP-p0ison.ovpn", true);
+    mc = ovpn_helper.merge_config("C:/Users/p0ison/Desktop/cefvpn-ovpn/OP-p0ison.ovpn", true);
 
-    config.content = mc.profileContent;
+    //cefvpn::ovpn o_vpn;
+
+    config.content = cefvpn::ovpn::content; //
+    if (cefvpn::ovpn::content != "NULL")
+        std::cout << cefvpn::ovpn::content;
+
     config.dco = false;
     config.allowLocalDnsResolvers = false;
 
@@ -75,13 +82,26 @@ void cefvpn::ovpn::connect()
     the_client = &client;
 
     ClientAPI::EvalConfig ev_config = client.eval_config(config);
+    ev_config.autologin = false;
 
-    ClientAPI::Status status = client.connect(); 
+    ProvideCreds creds;
+
+    creds.username = "vpnbook";
+    creds.password = "3ev7r8m";
+    creds.cachePassword = 1;
+    creds.replacePasswordWithSessionID = 1;
+
+    client.provide_creds(creds);
+
+    if (cefvpn::ovpn::content != "NULL") {
+        ClientAPI::Status status = client.connect();
+    } else {
+        std::cout << "Please Import Profile First...\n";
+    }
 }
 
 void cefvpn::ovpn::disconnect()
 {
-
     the_client->stop();
 }
 

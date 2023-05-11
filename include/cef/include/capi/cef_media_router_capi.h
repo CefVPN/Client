@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2023 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=77920892e7d9e8b98106e0bc8dfcf4b4c52a24e6$
+// $hash=de4a9b856c6951231f446991a9b1efb89096ad3b$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_MEDIA_ROUTER_CAPI_H_
@@ -256,13 +256,6 @@ typedef struct _cef_media_sink_t {
   ///
   // The resulting string must be freed by calling cef_string_userfree_free().
   cef_string_userfree_t(CEF_CALLBACK* get_name)(struct _cef_media_sink_t* self);
-
-  ///
-  /// Returns the description of this sink.
-  ///
-  // The resulting string must be freed by calling cef_string_userfree_free().
-  cef_string_userfree_t(CEF_CALLBACK* get_description)(
-      struct _cef_media_sink_t* self);
 
   ///
   /// Returns the icon type for this sink.

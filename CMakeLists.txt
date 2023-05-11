@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project (CefVPN)
 
 # Set CEF Version
-set(CEF_BIN_VERSION "cef_binary_107.1.12+g65b79a6+chromium-107.0.5304.122")
+set(CEF_BIN_VERSION "cef_binary_112.3.0+gb09c4ca+chromium-112.0.5615.165")
 
 # Cmake Modules.
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -240,19 +240,27 @@ set(OPENVPN3_SRCS
     src/cefvpn/cefvpn.cpp
 )
 
+set(SQLCipher_SRC
+    src/cefvpn/db/creds.hpp
+    src/cefvpn/db/creds.cpp
+)
+
 set(CEFCLIENT_SRCS
     ${CEFCLIENT_BROWSER_SRCS}
     ${CEFCLIENT_COMMON_SRCS}
     ${CEFCLIENT_RENDERER_SRCS}
     ${CEFCLIENT_WINDOWS_SRCS}
     ${OPENVPN3_SRCS}
+    ${SQLCipher_SRC}
 )
+
 
 set(WIN_SRC_FILES
     src/cefvpn/cefclient_win.cc
     src/cefvpn/cef_helper.h
     ${CEFCLIENT_SRCS}
 )
+
 
 set(OPENVPN3_DEFINES
     -DTAP_WIN_COMPONENT_ID=tap0901
@@ -285,6 +293,10 @@ set(WINDOWS_DEFS
     -D_HAS_EXCEPTIONS=0
     -DPSAPI_VERSION=1
     -D_HAS_ITERATOR_DEBUGGING=0
+)
+
+set(SQLCipher_DEFS
+    -DSQLITE_HAS_CODEC
 )
 
 set(CEF_DEFS
@@ -379,10 +391,10 @@ if(OS_WINDOWS)
     find_path(TAP_WINDOWS6_INCLUDE_DIRS "tap-windows.h")
 
     add_definitions(
-        -DCMAKE_INTDIR=${CONFIG}
         ${WINDOWS_DEFS}
         ${CEF_DEFS}
         ${OPENVPN3_DEFINES}
+        ${SQLCipher_DEFS}
         -DVCPKG_MANIFEST_INSTALL=ON
     )
 
@@ -416,7 +428,17 @@ if(OS_WINDOWS)
         D3D11.lib
         Shell32.lib
         Dwmapi.lib
+        Userenv.lib
+        Shcore.lib
+        ntdll.lib
+        runtimeobject.lib
         ${OPENVPN3_DEP_LIBS}
+    )
+
+    # Link SQLCipher
+    target_link_libraries(
+        ${PROJECT_NAME} PRIVATE
+        ${PROJECT_SOURCE_DIR}/third_party/sqlcipher/lib/sqlite3.lib
     )
 
 

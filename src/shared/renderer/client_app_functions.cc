@@ -36,11 +36,6 @@ namespace client
                         std::make_pair(message_name, browser_id),
                         std::make_pair(v8_context, arguments[1])));
 
-                CefV8ValueList args;
-
-                args.push_back(CefV8Value::CreateBool(true));
-
-                // call_back_fn->ExecuteFunction(nullptr, args);
 
                 CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
                 context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
@@ -67,6 +62,16 @@ namespace client
         else if (name == "hide_wnd")
         {
             CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
+
+            context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+        }
+        else if (name == "importProfile")
+        {
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
+            CefRefPtr<CefListValue> msg_args = msg->GetArgumentList();
+
+            msg_args->SetString(0, "Profile_Content");
+            msg_args->SetString(1, arguments[0]->GetStringValue());
 
             context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
         }
@@ -132,5 +137,4 @@ namespace client
             }
         }
     }
-
 }

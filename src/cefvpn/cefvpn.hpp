@@ -16,6 +16,8 @@ namespace cefvpn
 
         static std::string state;
 
+        static std::string content;
+
         static void NotifyConnectState(CefRefPtr<CefBrowser> browser);
         static void UpdateConnectState(std::string state);
 

@@ -23,7 +23,8 @@ const ImportProfile = ({modalIsOpen, closeModal}) => {
     const file = await fileHandle.getFile();
     const content = await file.text();
 
-    console.log(content);
+    //console.log(content);
+    window.importProfile(content);
     
   }
 

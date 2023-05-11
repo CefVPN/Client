@@ -358,11 +358,6 @@ void PrintToPDF(CefRefPtr<CefBrowser> browser) {
       if (!file_paths.empty()) {
         CefPdfPrintSettings settings;
 
-        // Show the URL in the footer.
-        settings.header_footer_enabled = true;
-        CefString(&settings.header_footer_url) =
-            browser_->GetMainFrame()->GetURL();
-
         // Print to the selected PDF file.
         browser_->GetHost()->PrintToPDF(file_paths[0], settings, this);
       }
@@ -765,7 +760,7 @@ void SetupResourceManager(CefRefPtr<CefResourceManager> resource_manager,
       std::string());
 
   // Read resources from a directory on disk.
-  std::string resource_dir = "C:/Users/skill/Dev/CefVPN/app/out";
+  std::string resource_dir = "C:/Users/p0ison/Dev/CefVPN/app/out";
   if (!resource_dir.empty()) {
     resource_manager->AddDirectoryProvider(test_origin, resource_dir, 100,
                                            std::string());

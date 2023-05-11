@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2023 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=6eed21d200bad5e898dfbe2701ad327cc1e4cc5c$
+// $hash=7674d3af52dd4272b454b2028e7a4ee72fb3c9ff$
 //
 
 #ifndef CEF_INCLUDE_CAPI_VIEWS_CEF_DISPLAY_CAPI_H_
@@ -153,6 +153,20 @@ cef_display_convert_screen_point_to_pixels(const cef_point_t* point);
 ///
 CEF_EXPORT cef_point_t
 cef_display_convert_screen_point_from_pixels(const cef_point_t* point);
+
+///
+/// Convert |rect| from DIP screen coordinates to pixel screen coordinates. This
+/// function is only used on Windows.
+///
+CEF_EXPORT cef_rect_t
+cef_display_convert_screen_rect_to_pixels(const cef_rect_t* rect);
+
+///
+/// Convert |rect| from pixel screen coordinates to DIP screen coordinates. This
+/// function is only used on Windows.
+///
+CEF_EXPORT cef_rect_t
+cef_display_convert_screen_rect_from_pixels(const cef_rect_t* rect);
 
 #ifdef __cplusplus
 }

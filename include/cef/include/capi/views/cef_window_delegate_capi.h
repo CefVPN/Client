@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2023 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=ea84b76b6965d1419e416581d87e82f74680bd07$
+// $hash=7201d268e16fc89f255b6ccd00d043f34fe77584$
 //
 
 #ifndef CEF_INCLUDE_CAPI_VIEWS_CEF_WINDOW_DELEGATE_CAPI_H_
@@ -66,6 +66,12 @@ typedef struct _cef_window_delegate_t {
                                         struct _cef_window_t* window);
 
   ///
+  /// Called when |window| is closing.
+  ///
+  void(CEF_CALLBACK* on_window_closing)(struct _cef_window_delegate_t* self,
+                                        struct _cef_window_t* window);
+
+  ///
   /// Called when |window| is destroyed. Release all references to |window| and
   /// do not attempt to execute any functions on |window| after this callback
   /// returns.
@@ -80,6 +86,15 @@ typedef struct _cef_window_delegate_t {
       struct _cef_window_delegate_t* self,
       struct _cef_window_t* window,
       int active);
+
+  ///
+  /// Called when |window| bounds have changed. |new_bounds| will be in DIP
+  /// screen coordinates.
+  ///
+  void(CEF_CALLBACK* on_window_bounds_changed)(
+      struct _cef_window_delegate_t* self,
+      struct _cef_window_t* window,
+      const cef_rect_t* new_bounds);
 
   ///
   /// Return the parent for |window| or NULL if the |window| does not have a
@@ -123,6 +138,25 @@ typedef struct _cef_window_delegate_t {
                                   struct _cef_window_t* window);
 
   ///
+  /// Return true (1) if |window| should be created with standard window buttons
+  /// like close, minimize and zoom. This function is only supported on macOS.
+  ///
+  int(CEF_CALLBACK* with_standard_window_buttons)(
+      struct _cef_window_delegate_t* self,
+      struct _cef_window_t* window);
+
+  ///
+  /// Return whether the titlebar height should be overridden, and sets the
+  /// height of the titlebar in |titlebar_height|. On macOS, it can also be used
+  /// to adjust the vertical position of the traffic light buttons in frameless
+  /// windows. The buttons will be positioned halfway down the titlebar at a
+  /// height of |titlebar_height| / 2.
+  ///
+  int(CEF_CALLBACK* get_titlebar_height)(struct _cef_window_delegate_t* self,
+                                         struct _cef_window_t* window,
+                                         float* titlebar_height);
+
+  ///
   /// Return true (1) if |window| can be resized.
   ///
   int(CEF_CALLBACK* can_resize)(struct _cef_window_delegate_t* self,
@@ -164,6 +198,17 @@ typedef struct _cef_window_delegate_t {
   int(CEF_CALLBACK* on_key_event)(struct _cef_window_delegate_t* self,
                                   struct _cef_window_t* window,
                                   const cef_key_event_t* event);
+
+  ///
+  /// Called when the |window| is transitioning to or from fullscreen mode. The
+  /// transition occurs in two stages, with |is_competed| set to false (0) when
+  /// the transition starts and true (1) when the transition completes. This
+  /// function is only supported on macOS.
+  ///
+  void(CEF_CALLBACK* on_window_fullscreen_transition)(
+      struct _cef_window_delegate_t* self,
+      struct _cef_window_t* window,
+      int is_completed);
 } cef_window_delegate_t;
 
 #ifdef __cplusplus
