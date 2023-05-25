@@ -251,7 +251,7 @@ set(CEFCLIENT_SRCS
     ${CEFCLIENT_RENDERER_SRCS}
     ${CEFCLIENT_WINDOWS_SRCS}
     ${OPENVPN3_SRCS}
-    ${SQLCipher_SRC}
+    #${SQLCipher_SRC}
 )
 
 

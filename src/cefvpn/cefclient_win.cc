@@ -43,6 +43,7 @@ namespace client
   {
     int RunMain(HINSTANCE hInstance, int nCmdShow)
     {
+#if defined(USE_SQLCIPHER)
       // Initialize SQLite
       cefdb cef_db;
 
@@ -50,7 +51,7 @@ namespace client
         cef_db.CreateDB();
         cef_db.CreateTable();
       //}
-
+#endif
       CefMainArgs main_args(hInstance);
 
       void *sandbox_info = nullptr;
