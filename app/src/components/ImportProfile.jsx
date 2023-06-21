@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ModalComponent from './Modal'
-import { IconX, IconBrandOpenvpn, IconLink } from '@tabler/icons';
+import { IconX, IconBrandOpenvpn, IconLink } from '@tabler/icons-react';
 //import fs from 'fs'
 
 const ImportProfile = ({modalIsOpen, closeModal}) => {

@@ -66,7 +66,7 @@ void cefvpn::ovpn::connect()
 
     OpenVPNClientHelper ovpn_helper;
 
-    mc = ovpn_helper.merge_config("C:/Users/p0ison/Desktop/cefvpn-ovpn/OP-p0ison.ovpn", true);
+    mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/ovpn-profiles/OP-p0ison.ovpn", true);
 
     //cefvpn::ovpn o_vpn;
 

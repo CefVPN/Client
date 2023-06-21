@@ -23,11 +23,3 @@ export function Max_WND()
 {
   window.max_wnd();
 }
-
-export function OnMaxButtonEnter() {
-  window.OnSnapLayouts(true);
-}
-
-export function OnMaxButtonLeave() {
-  window.OnSnapLayouts(false);
-}

@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 const modalStyles = {
     overlay: {
         position: "fixed",
-        backgroundColor: 'rgba(33, 37, 43, 0.70)'
+        backgroundColor: 'rgba(33, 37, 43, 0)'
     },
     content: {
         top: "50%",
@@ -26,6 +26,7 @@ const ModalComponent = ({ isOpen, closeModal, children }) => {
             closeModal={closeModal}
             onRequestClose={closeModal}
             style={modalStyles}
+            ariaHideApp={false}
         >
             {children}
         </Modal>

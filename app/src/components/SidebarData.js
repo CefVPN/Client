@@ -1,8 +1,5 @@
 import React from 'react'
-import { IconHome } from '@tabler/icons';
-import { IconFileImport } from '@tabler/icons';
-import { IconSettings } from '@tabler/icons';
-import { IconPalette } from '@tabler/icons';
+import { IconHome, IconFileImport, IconSettings, IconPalette } from '@tabler/icons-react';
 
 export const SidebarData = [
     {
@@ -12,8 +9,7 @@ export const SidebarData = [
     },
     {
         title: "Import Profile",
-        icon: <IconFileImport />,
-        link: ""
+        icon: <IconFileImport />
     },
     {
         title: "Settings",

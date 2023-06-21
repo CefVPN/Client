@@ -314,10 +314,6 @@ set(OPENVPN3_DEP_LIBS
     Fwpuclnt.lib
 )
 
-set(CEF_DEP_LIBS
-
-)
-
 if(OS_LINUX)
     # All sources required by the "cefclient" target. Generates an executable that
     # is used for all processes.
@@ -435,12 +431,14 @@ if(OS_WINDOWS)
         ${OPENVPN3_DEP_LIBS}
     )
 
-    # Link SQLCipher
-    target_link_libraries(
-        ${PROJECT_NAME} PRIVATE
-        ${PROJECT_SOURCE_DIR}/third_party/sqlcipher/lib/sqlite3.lib
-    )
+    if(DEFINED USE_SQLCIPHER) 
+        # Link SQLCipher
 
+        target_link_libraries(
+            ${PROJECT_NAME} PRIVATE
+            ${PROJECT_SOURCE_DIR}/third_party/sqlcipher/lib/sqlite3.lib
+        )
+    endif()
 
     # VCPKG libs...
     target_link_libraries(

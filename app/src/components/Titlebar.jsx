@@ -1,5 +1,5 @@
 import React from 'react'
-import { Close_WND, Min_WND, Max_WND, OnMaxButtonEnter, OnMaxButtonLeave } from './Handler'
+import { Close_WND, Min_WND, Max_WND } from './Handler'
 
 function Titlebar() {
   return (
@@ -11,7 +11,7 @@ function Titlebar() {
             <line x1={5} y1={12} x2={19} y2={12}></line>
           </svg>
         </div>
-        <div className="maximize_btn p-2 px-4 hover:bg-opacity-20 hover:bg-gray-700" onClick={Max_WND} onMouseEnter={OnMaxButtonEnter}  >
+        <div className="maximize_btn p-2 px-4 hover:bg-opacity-20 hover:bg-gray-700" onClick={Max_WND} >
           <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-square" width={14} height={14} viewBox="0 -1 24 24" strokeWidth="1" stroke="white" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <rect x={4} y={4} width={16} height={16} rx={2}></rect>

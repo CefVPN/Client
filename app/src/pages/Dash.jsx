@@ -1,12 +1,9 @@
 import { React, useState, useEffect } from 'react'
-import { useRouter } from 'next/router';
 import { Button, Box, Skeleton } from '@mui/material'
 import { alpha, createTheme, ThemeProvider } from '@mui/material/styles';
 import { Handler, Disconnect, isFullscreen } from '../components/Handler'
-import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
-import "country-flag-icons/3x2/flags.css";
 import Modal from 'react-modal'
-import ImportProfile from '../components/ImportProfile';
+import ImportProfile from "../components/ImportProfile"
 
 const theme = createTheme({
   status: {
@@ -93,11 +90,10 @@ export default function Dash() {
     }
     if(!isConnected)    
       setIsConnecting(!isConnecting)
-  }  
+  }   
   return (
     
     <div className="text-white absolute h-screen w-screen pl-5">
-
       <div className="Power-btn w-full h-full flex justify-center items-center">
         <div className={`w-48 h-48 rounded-full cursor-pointer ${isConnected ? "bg-emerald-600" : "bg-blue-600"} opacity-95 justify-center items-center flex -mt-32`}
           onClick={() => Power()}

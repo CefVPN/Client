@@ -192,6 +192,10 @@ namespace client
       }
       break;
     }
+    case WM_NCHITTEST: {
+
+      
+    }
 
     default:
       // Call the old window procedure for any unhandled messages

@@ -3,7 +3,7 @@ bin/
 lib/
 build/
 GPUCache/
-app/node_modules/
+node_modules/
 package-lock.json
 vcpkg_installed/
 Backup/
