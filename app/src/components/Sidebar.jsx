@@ -1,7 +1,8 @@
 import { React, useState } from "react";
 import { SidebarData } from "./SidebarData";
-import ImportProfile from "./ImportProfile";
+import ImportProfile from "./ImportModal"
 import { Link } from "react-router-dom";
+import EvalProfile from "./EvalProfile";
 
 export default function Sidebar() {
   const [isHovering, setIsHovering] = useState(false);
@@ -17,11 +18,11 @@ export default function Sidebar() {
   };
 
   const openModal = () => {
-    setIsHovering(false);
     setModalIsOpen(true);
   };
 
   const closeModal = () => {
+    setIsHovering(false)
     setModalIsOpen(false);
   };
 
@@ -29,8 +30,8 @@ export default function Sidebar() {
     <>
       <div
         className="Sidebar titlebar_none h-screen w-20 bg-Sidebar_dbg transition-[width] duration-300 relative shadow-md shadow-gray-900 hover:w-56"
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
+        onMouseOver={() => handleMouseOver()}
+        onMouseLeave={() => handleMouseOut()}
       >
         <ImportProfile modalIsOpen={isModalOpen} closeModal={closeModal} />
         <ul className="SidebarList pt-2">
@@ -41,8 +42,16 @@ export default function Sidebar() {
                 className="row text-white h-full cursor-pointer hover:bg-slate-600 transition-colors duration-100"
               >
                 <Link
-                  className="sidebarlist pt-4 pb-4 ml-2 mr-2 transition-colors duration-100 flex rounded-md"
-                  to={val.link}
+                  className="sidebarlist flex pl-2 pt-4 pb-4 transition-colors duration-100"
+                  to={val.link != null && val.link}
+                  onClick={() => {
+                    if(val.link == null) {
+                      if(val.title === "Import Profile") {
+                        openModal();
+                        handleMouseOut();
+                      }
+                    }
+                  }}
                 >
                   <div
                     id="icon"

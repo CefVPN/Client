@@ -452,13 +452,13 @@ bool ClientHandler::OnProcessMessageReceived(
 
   CefRefPtr<CefWindow> window = browser_view->GetWindow();
 
+  cefvpn::ovpn::NotifyConnectState(browser);
+
   if(message->GetName() == "str_cr")
   {
     std::cout << "[CefVPN:EXEC: CONNECT]\n";
     std::thread c(cefvpn::ovpn::connect);
     c.detach();
-
-    cefvpn::ovpn::NotifyConnectState(browser);
 
     CefRefPtr<CefProcessMessage> Ignit_stat = CefProcessMessage::Create("CONNECT:STAT");
       
@@ -503,6 +503,9 @@ bool ClientHandler::OnProcessMessageReceived(
           vpn.content = arg_list->GetString(1);
       */
       cefvpn::ovpn::content = arg_list->GetString(1);
+
+      cefvpn::ovpn::ImportProfile(arg_list->GetString(1), browser);
+
       // std::cout << vpn.content;
     }
   }

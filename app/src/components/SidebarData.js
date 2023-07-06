@@ -12,12 +12,12 @@ export const SidebarData = [
         icon: <IconFileImport />
     },
     {
+        title: "Themify",
+        icon: <IconPalette />
+    },
+    {
         title: "Settings",
         icon: <IconSettings />,
         link: "/config"
-    },
-    {
-        title: "Themify",
-        icon: <IconPalette />
     }
 ]

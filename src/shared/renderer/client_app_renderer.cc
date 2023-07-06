@@ -137,6 +137,14 @@ bool ClientAppRenderer::OnProcessMessageReceived(
 
     _cefV8Handler->ExecuteFunction(message->GetName(), browser, nullptr, 0);
 
+  } else if(message->GetName() == "CEvalInfo") {
+    CefRefPtr<CefListValue> CEvalArgs = message->GetArgumentList();
+
+    std::string profileName = CEvalArgs->GetString(0);
+
+    _cefV8Handler->ExecuteFunction("Import.Profile", browser, CEvalArgs, 0);
+
+    //frame->ExecuteJavaScript("alert('Imported Profile!!!')", frame->GetURL(), 0);
   }
 
   DelegateSet::iterator it = delegates_.begin();

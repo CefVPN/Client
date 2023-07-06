@@ -6,26 +6,30 @@
 
 namespace cefvpn
 {
-    class ovpn
-    {
-    public:
-        static void connect();
-        static void disconnect();
-        static bool isConnected;
-        static bool isConnecting;
+  class ovpn
+  {
+  public:
+    static void connect();
+    static void disconnect();
+    static bool isConnected;
+    static bool isConnecting;
 
-        static std::string state;
+    static std::string state;
 
-        static std::string content;
+    static std::string content;
 
-        static void NotifyConnectState(CefRefPtr<CefBrowser> browser);
-        static void UpdateConnectState(std::string state);
+    static void NotifyConnectState(CefRefPtr<CefBrowser> browser);
+    static void UpdateConnectState(std::string state);
+    static void ImportProfile(std::string content, CefRefPtr<CefBrowser> browser);
+    static void EvalConfigInfo(openvpn::ClientAPI::Config config, CefRefPtr<CefBrowser> browser);
 
-        virtual ~ovpn();
-    };
-    class OS
-    {
-    public:
-        static bool Shell_Notify(std::wstring title, std::wstring message);
-    };
+    virtual ~ovpn();
+
+    private:
+  };
+  class OS
+  {
+  public:
+    static bool Shell_Notify(std::wstring title, std::wstring message);
+  };
 }

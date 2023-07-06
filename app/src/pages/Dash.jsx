@@ -1,69 +1,10 @@
 import { React, useState, useEffect } from 'react'
-import { Button, Box, Skeleton } from '@mui/material'
-import { alpha, createTheme, ThemeProvider } from '@mui/material/styles';
 import { Handler, Disconnect, isFullscreen } from '../components/Handler'
-import Modal from 'react-modal'
-import ImportProfile from "../components/ImportProfile"
+import EvalProfile from '../components/EvalProfile';
 
-const theme = createTheme({
-  status: {
-    danger: '#1B76D2',
-  },
-  palette: {
-    primary: {
-      light: "#1B76D2",
-      main: '#1B76D2',
-      darker: '#1B76D2',
-    },
-    neutral: {
-      main: '#1B76D2',
-      contrastText: '#1B76D2',
-    },
-  },
-});
-
-async function getIPLocation() {
-  const response = await fetch('https://ipinfo.io/?token=a416934c6bf2af');
-  const responseJson = await response.json();
-  const region = await responseJson.region;
-  const country = await responseJson.country;
-  const city = await responseJson.city;
-  const loc = await responseJson.loc.split(',');
-  const coords = {
-    latitude: await loc[0],
-    longitude: await loc[1]
-  };
-  const posobj = {
-    lat: coords.latitude,
-    long: coords.longitude,
-    rg: region,
-    cn: country,
-    cy: city
-  }
-  return posobj;
-}
-
-var checked = false;
 
 export default function Dash() {
-  const [position, setPosition] = useState({ x:0, y:0, cn:"", rg:"", cy:"" });
-  //getIPLocation().then(iploc => {
-  //  position.x = iploc.lat;
-  //  position.y = iploc.long;
-  //  position.cn = iploc.cn;
-  //  position.rg = iploc.rg;
-  //  position.cy = iploc.cy;
-  //  if(!checked)
-  //  {
-  //    checked = true;
-  //  }
-  //  console.log(position.x, position.y);
-  //})
-
   const [isHovering, setIsHovering] = useState(false);
-
-
-
 
   const handleMouseOver = () => {
     setIsHovering(true);

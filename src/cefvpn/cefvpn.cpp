@@ -13,126 +13,149 @@ using namespace openvpn;
 class Client : public ClientAPI::OpenVPNClient
 {
 private:
-    virtual void event(const ClientAPI::Event &ev) override
+  virtual void event(const ClientAPI::Event &ev) override
+  {
+
+    std::cout << ev.info;
+
+    cefvpn::ovpn::isConnected = ev.name == "CONNECTED" ? true : false;
+
+    if (cefvpn::ovpn::isConnected)
     {
-
-        std::cout << ev.info;
-
-        cefvpn::ovpn::isConnected = ev.name == "CONNECTED" ? true : false;
-
-        if(cefvpn::ovpn::isConnected) {
-            cefvpn::OS::Shell_Notify(L"CefVPN Client", L"CONNECTED!");
-        }
-
-        if(ev.name != "CONNECTED" && ev.name != "DISCONNECTED") {
-            cefvpn::ovpn::isConnecting = 1;
-        } else 
-            cefvpn::ovpn::isConnecting = 0;
-
-        cefvpn::ovpn::UpdateConnectState(ev.name);
-
+      cefvpn::OS::Shell_Notify(L"CefVPN Client", L"CONNECTED!");
     }
 
-    virtual void log(const ClientAPI::LogInfo &info) override
+    if (ev.name != "CONNECTED" && ev.name != "DISCONNECTED")
     {
-        std::cout << "[" << date_time() << "] " << info.text << std::flush;
+      cefvpn::ovpn::isConnecting = 1;
     }
+    else
+      cefvpn::ovpn::isConnecting = 0;
 
-    virtual void external_pki_cert_request(ClientAPI::ExternalPKICertRequest &certreq) override
-    {
-    }
+    cefvpn::ovpn::UpdateConnectState(ev.name);
+  }
 
-    virtual void external_pki_sign_request(ClientAPI::ExternalPKISignRequest &signcert) override
-    {
-    }
+  virtual void log(const ClientAPI::LogInfo &info) override
+  {
+    std::cout << "[" << date_time() << "] " << info.text << std::flush;
+  }
 
-    virtual bool pause_on_connection_timeout() override
-    {
-        return false;
-    }
+  virtual void external_pki_cert_request(ClientAPI::ExternalPKICertRequest &certreq) override {}
+
+  virtual void external_pki_sign_request(ClientAPI::ExternalPKISignRequest &signcert) override {}
+
+  virtual bool pause_on_connection_timeout() override { return false; }
 };
 
-static Client *the_client = nullptr;
+static Client *the_client = nullptr; // GLOBAL
 std::string cefvpn::ovpn::content = "NULL";
 cefvpn::ovpn::~ovpn() {}
 
+static CefRefPtr<CefBrowser> cef_browser;
+
+void cefvpn::ovpn::ImportProfile(std::string content, CefRefPtr<CefBrowser> browser) {
+
+  ClientAPI::Config config;
+
+  if(!content.empty()) {
+    config.content = content;
+    EvalConfigInfo(config, browser);
+  }
+}
+
+void cefvpn::ovpn::EvalConfigInfo(ClientAPI::Config config, CefRefPtr<CefBrowser> browser) {
+
+  Client client;
+
+  the_client = &client;
+  ClientAPI::EvalConfig ev_config = client.eval_config(config);
+
+  CefRefPtr<CefProcessMessage> configEvalInfo = CefProcessMessage::Create("CEvalInfo");
+  CefRefPtr<CefListValue> configEvalArgs = configEvalInfo->GetArgumentList();
+  
+  configEvalArgs->SetString(0, ev_config.profileName);
+
+  browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, configEvalInfo);
+}
+
 void cefvpn::ovpn::connect()
 {
-    using namespace openvpn::ClientAPI;
+  using namespace openvpn::ClientAPI;
 
-    ClientAPI::Config config;
+  ClientAPI::Config config;
 
-    MergeConfig mc;
+  MergeConfig mc;
 
-    OpenVPNClientHelper ovpn_helper;
+  OpenVPNClientHelper ovpn_helper;
 
-    mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/ovpn-profiles/OP-p0ison.ovpn", true);
+  mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/ovpn-profiles/OP-p0ison.ovpn", true);
 
-    //cefvpn::ovpn o_vpn;
+  // cefvpn::ovpn o_vpn;
 
-    config.content = cefvpn::ovpn::content; //
-    if (cefvpn::ovpn::content != "NULL")
-        std::cout << cefvpn::ovpn::content;
+  config.content = cefvpn::ovpn::content; //
+  if (cefvpn::ovpn::content != "NULL")
+    std::cout << cefvpn::ovpn::content;
 
-    config.dco = false;
-    config.allowLocalDnsResolvers = false;
+  config.dco = false;
+  config.allowLocalDnsResolvers = false;
 
-    Client client;
 
-    the_client = &client;
+ // ClientAPI::EvalConfig ev_config = client.eval_config(config);
 
-    ClientAPI::EvalConfig ev_config = client.eval_config(config);
-    ev_config.autologin = false;
+  ProvideCreds creds;
 
-    ProvideCreds creds;
+  creds.username = "vpnbook";
+  creds.password = "3ev7r8m";
+  creds.cachePassword = 1;
+  creds.replacePasswordWithSessionID = 1;
 
-    creds.username = "vpnbook";
-    creds.password = "3ev7r8m";
-    creds.cachePassword = 1;
-    creds.replacePasswordWithSessionID = 1;
+ // client.provide_creds(creds);
 
-    client.provide_creds(creds);
-
-    if (cefvpn::ovpn::content != "NULL") {
-        ClientAPI::Status status = client.connect();
-    } else {
-        std::cout << "Please Import Profile First...\n";
-    }
+  if (cefvpn::ovpn::content != "NULL")
+  {
+    ClientAPI::Status status = the_client->connect();
+  }
+  else
+  {
+    std::cout << "Please Import Profile First...\n";
+  }
 }
 
 void cefvpn::ovpn::disconnect()
 {
-    the_client->stop();
+  the_client->stop();
 }
 
-static CefRefPtr<CefBrowser> cef_browser;
-
-void cefvpn::ovpn::NotifyConnectState(CefRefPtr<CefBrowser> browser) {
-    cef_browser = browser;
+void cefvpn::ovpn::NotifyConnectState(CefRefPtr<CefBrowser> browser)
+{
+  cef_browser = browser;
 }
 
-void cefvpn::ovpn::UpdateConnectState(std::string state) {
+void cefvpn::ovpn::UpdateConnectState(std::string state)
+{
 
-    std::string VPN_STATE = "CEFVPN:STATE:" + state;
+  std::string VPN_STATE = "CEFVPN:STATE:" + state;
 
-    CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(VPN_STATE);
+  CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(VPN_STATE);
 
-    cef_browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, msg);
+  cef_browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, msg);
 
-    //std::cout << VPN_STATE << std::endl;
-
+  // std::cout << VPN_STATE << std::endl;
 }
 
-bool cefvpn::OS::Shell_Notify(std::wstring title, std::wstring message) {
 
-    // Display a low ink balloon message. This is a warning, so show the appropriate system icon.
-    NOTIFYICONDATAW nid = { };
-      nid.cbSize = sizeof(NOTIFYICONDATA);
-      nid.uID = 0;
-      nid.uFlags = NIF_INFO;
-      nid.dwInfoFlags = NIIF_INFO;
-      nid.uTimeout = 1000; // 1 second timeout
-      wcscpy_s(nid.szInfoTitle, L"CefVPN Status:");
-      wcscpy_s(nid.szInfo, L"CONNECTED!");
-    return Shell_NotifyIcon(NIM_ADD, &nid);
+
+bool cefvpn::OS::Shell_Notify(std::wstring title, std::wstring message)
+{
+
+  // Display a low ink balloon message. This is a warning, so show the appropriate system icon.
+  NOTIFYICONDATAW nid = {};
+  nid.cbSize = sizeof(NOTIFYICONDATA);
+  nid.uID = 0;
+  nid.uFlags = NIF_INFO;
+  nid.dwInfoFlags = NIIF_INFO;
+  nid.uTimeout = 1000; // 1 second timeout
+  wcscpy_s(nid.szInfoTitle, L"CefVPN Status:");
+  wcscpy_s(nid.szInfo, L"CONNECTED!");
+  return Shell_NotifyIcon(NIM_ADD, &nid);
 }
