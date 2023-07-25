@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <style>
-            html, body {
-                background-color: #1f2429;
-                margin: 0;
-                height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                user-select: none;
-                pointer-events: none;
-            }
-        </style>
-        <script>
-            function pageLoad() {
-                window.location = "cefvpn://client/index.html";
-            }
-        </script>
-    </head>
-    <body onload="pageLoad()">
-        <img height="120px" width="120px" src="cefvpn://client/CefVPN.png">
-    </body>
+  <head>
+    <style>
+      html,
+      body {
+        background-color: #1f2429;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        pointer-events: none;
+      }
+    </style>
+    <script>
+      function delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+      }
+
+      async function pageLoad() {
+        await delay(1000);
+        window.location = "cefvpn://client/index.html";
+      }
+    </script>
+  </head>
+  <body onload="pageLoad()">
+    <img height="120px" width="120px" src="cefvpn://client/CefVPN.png" />
+  </body>
 </html>

@@ -1,8 +1,9 @@
 import { React, useState } from "react";
 import { SidebarData } from "./SidebarData";
 import ImportProfile from "./ImportModal"
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import EvalProfile from "./EvalProfile";
+import "../styles/app.css"
 
 export default function Sidebar() {
   const [isHovering, setIsHovering] = useState(false);
@@ -26,6 +27,16 @@ export default function Sidebar() {
     setModalIsOpen(false);
   };
 
+  function filterRoute(curLoc, link) {
+    if(link === "/import") {
+      return null;
+    } else if (link === "/themify") {
+      return null;
+    } else {
+      return link;
+    }
+  } 
+
   return (
     <>
       <div
@@ -38,15 +49,16 @@ export default function Sidebar() {
           {SidebarData.map((val, key) => {
             return (
               <li
+                id="sidebar"
                 key={key}
                 className="row text-white h-full cursor-pointer hover:bg-slate-600 transition-colors duration-100"
               >
-                <Link
-                  className="sidebarlist flex pl-2 pt-4 pb-4 transition-colors duration-100"
-                  to={val.link != null && val.link}
+                <NavLink
+                  className={({isActive}) => `sidebarlist flex pl-2 pt-4 pb-4 transition-colors duration-100 `}
+                  to={val.link} // val.link != null && val.link
                   onClick={() => {
-                    if(val.link == null) {
-                      if(val.title === "Import Profile") {
+                    if(val.link == "/import") {
+                      if(val.title === "Import Profile") { 
                         openModal();
                         handleMouseOut();
                       }
@@ -71,7 +83,7 @@ export default function Sidebar() {
                   >
                     {val.title}
                   </div>
-                </Link>
+                </NavLink>
               </li>
             );
           })}

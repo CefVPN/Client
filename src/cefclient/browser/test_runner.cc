@@ -760,7 +760,7 @@ void SetupResourceManager(CefRefPtr<CefResourceManager> resource_manager,
       std::string());
 
   // Read resources from a directory on disk.
-  std::string resource_dir = "C:/Users/skill/Dev/CefVPN/app/out";
+  std::string resource_dir = "C:/Users/skill/Dev/CefVPN/app/build";
   if (!resource_dir.empty()) {
     resource_manager->AddDirectoryProvider(test_origin, resource_dir, 100,
                                            std::string());

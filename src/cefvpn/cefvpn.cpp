@@ -3,6 +3,7 @@
 
 #include <openvpn/client/clievent.hpp>
 #include <openvpn/time/timestr.hpp>
+#include <memory>
 
 #include <shellapi.h>
 
@@ -10,69 +11,77 @@ std::string cefvpn::ovpn::state;
 
 using namespace openvpn;
 
-class Client : public ClientAPI::OpenVPNClient
+void cefvpn::Client::event(const ClientAPI::Event &ev)
 {
-private:
-  virtual void event(const ClientAPI::Event &ev) override
+  std::cout << ev.info;
+
+  cefvpn::ovpn::isConnected = ev.name == "CONNECTED" ? true : false;
+
+  if (cefvpn::ovpn::isConnected)
   {
-
-    std::cout << ev.info;
-
-    cefvpn::ovpn::isConnected = ev.name == "CONNECTED" ? true : false;
-
-    if (cefvpn::ovpn::isConnected)
-    {
-      cefvpn::OS::Shell_Notify(L"CefVPN Client", L"CONNECTED!");
-    }
-
-    if (ev.name != "CONNECTED" && ev.name != "DISCONNECTED")
-    {
-      cefvpn::ovpn::isConnecting = 1;
-    }
-    else
-      cefvpn::ovpn::isConnecting = 0;
-
-    cefvpn::ovpn::UpdateConnectState(ev.name);
+    cefvpn::OS::Shell_Notify(L"CefVPN Client", L"CONNECTED!");
   }
 
-  virtual void log(const ClientAPI::LogInfo &info) override
+  if (ev.name != "CONNECTED" && ev.name != "DISCONNECTED")
   {
-    std::cout << "[" << date_time() << "] " << info.text << std::flush;
+    cefvpn::ovpn::isConnecting = 1;
   }
+  else
+    cefvpn::ovpn::isConnecting = 0;
 
-  virtual void external_pki_cert_request(ClientAPI::ExternalPKICertRequest &certreq) override {}
+  cefvpn::ovpn::UpdateConnectState(ev.name);
+}
 
-  virtual void external_pki_sign_request(ClientAPI::ExternalPKISignRequest &signcert) override {}
+void cefvpn::Client::log(const ClientAPI::LogInfo& info) {
+  std::cout << "[" << date_time() << "] " << info.text << std::flush;
+}
 
-  virtual bool pause_on_connection_timeout() override { return false; }
-};
+void cefvpn::Client::external_pki_cert_request(ClientAPI::ExternalPKICertRequest& certreq) {}
 
-static Client *the_client = nullptr; // GLOBAL
+void cefvpn::Client::external_pki_sign_request(ClientAPI::ExternalPKISignRequest& signcert) {}
+
+bool cefvpn::Client::pause_on_connection_timeout() { return false; }
+
+ // GLOBAL
+//cefvpn::Client *the_client;
+std::unique_ptr<cefvpn::Client> the_client;
+
 std::string cefvpn::ovpn::content = "NULL";
+bool cefvpn::ovpn::isProfileImported = false;
 cefvpn::ovpn::~ovpn() {}
 
 static CefRefPtr<CefBrowser> cef_browser;
 
-void cefvpn::ovpn::ImportProfile(std::string content, CefRefPtr<CefBrowser> browser) {
+void cefvpn::ovpn::ImportProfile(std::string content, CefRefPtr<CefBrowser> browser)
+{
+ //
+ the_client = std::make_unique<Client>();
+ //the_client = new Client();
 
   ClientAPI::Config config;
+  config.dco = false;
 
-  if(!content.empty()) {
+
+  if (!content.empty())
+  {
+    cefvpn::ovpn::content = content;
     config.content = content;
     EvalConfigInfo(config, browser);
   }
 }
 
-void cefvpn::ovpn::EvalConfigInfo(ClientAPI::Config config, CefRefPtr<CefBrowser> browser) {
+void cefvpn::ovpn::EvalConfigInfo(ClientAPI::Config config, CefRefPtr<CefBrowser> browser)
+{
+  
+  ClientAPI::EvalConfig ev_config = the_client->eval_config(config);
 
-  Client client;
-
-  the_client = &client;
-  ClientAPI::EvalConfig ev_config = client.eval_config(config);
+  if(!ev_config.error) {
+    cefvpn::ovpn::isProfileImported = true;
+  }
 
   CefRefPtr<CefProcessMessage> configEvalInfo = CefProcessMessage::Create("CEvalInfo");
   CefRefPtr<CefListValue> configEvalArgs = configEvalInfo->GetArgumentList();
-  
+
   configEvalArgs->SetString(0, ev_config.profileName);
 
   browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, configEvalInfo);
@@ -80,50 +89,18 @@ void cefvpn::ovpn::EvalConfigInfo(ClientAPI::Config config, CefRefPtr<CefBrowser
 
 void cefvpn::ovpn::connect()
 {
-  using namespace openvpn::ClientAPI;
-
-  ClientAPI::Config config;
-
-  MergeConfig mc;
-
-  OpenVPNClientHelper ovpn_helper;
-
-  mc = ovpn_helper.merge_config("C:/Users/skill/Desktop/ovpn-profiles/OP-p0ison.ovpn", true);
-
-  // cefvpn::ovpn o_vpn;
-
-  config.content = cefvpn::ovpn::content; //
-  if (cefvpn::ovpn::content != "NULL")
-    std::cout << cefvpn::ovpn::content;
-
-  config.dco = false;
-  config.allowLocalDnsResolvers = false;
-
-
- // ClientAPI::EvalConfig ev_config = client.eval_config(config);
-
-  ProvideCreds creds;
-
-  creds.username = "vpnbook";
-  creds.password = "3ev7r8m";
-  creds.cachePassword = 1;
-  creds.replacePasswordWithSessionID = 1;
-
- // client.provide_creds(creds);
-
-  if (cefvpn::ovpn::content != "NULL")
-  {
+  if(isProfileImported) {
     ClientAPI::Status status = the_client->connect();
-  }
-  else
-  {
-    std::cout << "Please Import Profile First...\n";
+  } else {
+    std::cout << "Please Import Profile Before Connecting to VPN...\n";
   }
 }
 
 void cefvpn::ovpn::disconnect()
 {
-  the_client->stop();
+  if(isProfileImported) {
+    the_client->stop();
+  }
 }
 
 void cefvpn::ovpn::NotifyConnectState(CefRefPtr<CefBrowser> browser)
@@ -142,8 +119,6 @@ void cefvpn::ovpn::UpdateConnectState(std::string state)
 
   // std::cout << VPN_STATE << std::endl;
 }
-
-
 
 bool cefvpn::OS::Shell_Notify(std::wstring title, std::wstring message)
 {

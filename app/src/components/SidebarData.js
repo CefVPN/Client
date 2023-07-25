@@ -9,11 +9,13 @@ export const SidebarData = [
     },
     {
         title: "Import Profile",
-        icon: <IconFileImport />
+        icon: <IconFileImport />,
+        link: "/import"
     },
     {
         title: "Themify",
-        icon: <IconPalette />
+        icon: <IconPalette />,
+        link: "/themify"
     },
     {
         title: "Settings",

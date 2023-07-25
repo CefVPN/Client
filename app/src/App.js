@@ -1,5 +1,5 @@
 import { ReactDOM } from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import Dash from './pages/Dash'
 import Settings from './pages/config'
@@ -7,7 +7,7 @@ import Titlebar from './components/Titlebar';
 import Sidebar from './components/Sidebar';
 
 
-function App() {
+function App() { 
   return (
     <div className='main_cnt bg-main_dbg select-none'>
       <head>
@@ -16,7 +16,8 @@ function App() {
       </head>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<Dash />}/>
+          <Route path='/' element={<Dash />} />
+          <Route path='/index.html' element={<Navigate replace to={"/"} />} />
           <Route path='/config' element={<Settings />}/>
         </Routes>
         <Titlebar />
