@@ -44,7 +44,7 @@ bool cefvpn::Client::pause_on_connection_timeout() { return false; }
 
  // GLOBAL
 //cefvpn::Client *the_client;
-std::unique_ptr<cefvpn::Client> the_client;
+std::unique_ptr<cefvpn::Client> the_client(new cefvpn::Client());
 
 std::string cefvpn::ovpn::content = "NULL";
 bool cefvpn::ovpn::isProfileImported = false;
@@ -55,7 +55,7 @@ static CefRefPtr<CefBrowser> cef_browser;
 void cefvpn::ovpn::ImportProfile(std::string content, CefRefPtr<CefBrowser> browser)
 {
  //
- the_client = std::make_unique<Client>();
+ //the_client = std::make_unique<Client>();
  //the_client = new Client();
 
   ClientAPI::Config config;

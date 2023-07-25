@@ -27,9 +27,9 @@
 
 namespace openvpn {
 
-  // return a string that describes our platform
-  inline const char *platform_name()
-  {
+// return a string that describes our platform
+inline const char *platform_name()
+{
 #if defined(OPENVPN_PLATFORM_WIN)
 #if defined(OPENVPN_PLATFORM_UWP)
     return "uwp";
@@ -46,10 +46,12 @@ namespace openvpn {
     return "android";
 #elif defined(OPENVPN_PLATFORM_LINUX)
     return "linux";
+#elif defined(OPENVPN_PLATFORM_FREEBSD)
+    return "FreeBSD";
 #else
-    return nullptr;
+    static_assert(false);
 #endif
-  }
+}
 
 } // namespace openvpn
 

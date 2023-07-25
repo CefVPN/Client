@@ -55,7 +55,7 @@ export default function Sidebar() {
               >
                 <NavLink
                   className={({isActive}) => `sidebarlist flex pl-2 pt-4 pb-4 transition-colors duration-100 `}
-                  to={val.link} // val.link != null && val.link
+                  to={val.link === "/import" || "/themify" && val.link } // val.link != null && val.link
                   onClick={() => {
                     if(val.link == "/import") {
                       if(val.title === "Import Profile") { 

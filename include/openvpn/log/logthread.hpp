@@ -37,7 +37,6 @@
 #endif
 
 #include <openvpn/common/size.hpp>
-#include <openvpn/common/extern.hpp>
 
 // Define these parameters before including this header:
 
@@ -52,117 +51,127 @@
 #error OPENVPN_LOG_INFO must be defined
 #endif
 
-# define OPENVPN_LOG(args) \
-  do { \
-    if (openvpn::Log::Context::defined()) {	\
-      std::ostringstream _ovpn_log; \
-      _ovpn_log << args << '\n'; \
-      (openvpn::Log::Context::obj()->log(OPENVPN_LOG_INFO(_ovpn_log.str()))); \
-    } \
-  } while (0)
+#define OPENVPN_LOG(args)                                                           \
+    do                                                                              \
+    {                                                                               \
+        if (openvpn::Log::Context::defined())                                       \
+        {                                                                           \
+            std::ostringstream _ovpn_log;                                           \
+            _ovpn_log << args << '\n';                                              \
+            (openvpn::Log::Context::obj()->log(OPENVPN_LOG_INFO(_ovpn_log.str()))); \
+        }                                                                           \
+    } while (0)
 
 // like OPENVPN_LOG but no trailing newline
-#define OPENVPN_LOG_NTNL(args) \
-  do { \
-    if (openvpn::Log::Context::defined()) {	\
-      std::ostringstream _ovpn_log; \
-      _ovpn_log << args; \
-      (openvpn::Log::Context::obj()->log(OPENVPN_LOG_INFO(_ovpn_log.str()))); \
-    } \
-  } while (0)
+#define OPENVPN_LOG_NTNL(args)                                                      \
+    do                                                                              \
+    {                                                                               \
+        if (openvpn::Log::Context::defined())                                       \
+        {                                                                           \
+            std::ostringstream _ovpn_log;                                           \
+            _ovpn_log << args;                                                      \
+            (openvpn::Log::Context::obj()->log(OPENVPN_LOG_INFO(_ovpn_log.str()))); \
+        }                                                                           \
+    } while (0)
 
-# define OPENVPN_LOG_STRING(str) \
-  do { \
-    if (openvpn::Log::Context::defined()) {			  \
-      (openvpn::Log::Context::obj()->log(OPENVPN_LOG_INFO(str))); \
-    } \
-  } while (0)
+#define OPENVPN_LOG_STRING(str)                                         \
+    do                                                                  \
+    {                                                                   \
+        if (openvpn::Log::Context::defined())                           \
+        {                                                               \
+            (openvpn::Log::Context::obj()->log(OPENVPN_LOG_INFO(str))); \
+        }                                                               \
+    } while (0)
 
 namespace openvpn {
-  namespace Log {
+namespace Log {
 
 #ifdef OPENVPN_LOG_GLOBAL
-    // OPENVPN_LOG uses global object pointer
-    OPENVPN_EXTERN OPENVPN_LOG_CLASS* global_log; // GLOBAL
-    struct Context
+// OPENVPN_LOG uses global object pointer
+inline OPENVPN_LOG_CLASS *global_log; // GLOBAL
+struct Context
+{
+    struct Wrapper
     {
-      struct Wrapper
-      {
-      };
-
-      Context(const Wrapper& wrap)
-      {
-      }
-
-      Context(OPENVPN_LOG_CLASS *cli)
-      {
-	global_log = cli;
-      }
-
-      ~Context()
-      {
-	global_log = nullptr;
-      }
-
-      static bool defined()
-      {
-	return global_log != nullptr;
-      }
-
-      static OPENVPN_LOG_CLASS* obj()
-      {
-	return global_log;
-      }
     };
+
+    Context(const Wrapper &wrap)
+    {
+    }
+
+    Context(OPENVPN_LOG_CLASS *cli)
+    {
+        global_log = cli;
+    }
+
+    ~Context()
+    {
+        global_log = nullptr;
+    }
+
+    static bool defined()
+    {
+        return global_log != nullptr;
+    }
+
+    static OPENVPN_LOG_CLASS *obj()
+    {
+        return global_log;
+    }
+};
 #else
-    // OPENVPN_LOG uses thread-local object pointer
+// OPENVPN_LOG uses thread-local object pointer
 #if defined(USE_ASIO) && defined(USE_ASIO_THREADLOCAL)
-    OPENVPN_EXTERN asio::detail::tss_ptr<OPENVPN_LOG_CLASS> global_log; // GLOBAL
+inline asio::detail::tss_ptr<OPENVPN_LOG_CLASS> global_log; // GLOBAL
 #else
-    OPENVPN_EXTERN thread_local OPENVPN_LOG_CLASS* global_log; // GLOBAL
+inline thread_local OPENVPN_LOG_CLASS *global_log; // GLOBAL
 #endif
-    struct Context
+struct Context
+{
+    // Mechanism for passing thread-local
+    // global_log to another thread.
+    class Wrapper
     {
-      // Mechanism for passing thread-local
-      // global_log to another thread.
-      class Wrapper
-      {
       public:
-	Wrapper() : log(obj()) {}
+        Wrapper()
+            : log(obj())
+        {
+        }
+
       private:
-	friend struct Context;
-	OPENVPN_LOG_CLASS *log;
-      };
-
-      // While in scope, turns on global_log
-      // for this thread.
-      Context(const Wrapper& wrap)
-      {
-	global_log = wrap.log;
-      }
-
-      Context(OPENVPN_LOG_CLASS *cli)
-      {
-	global_log = cli;
-      }
-
-      ~Context()
-      {
-	global_log = nullptr;
-      }
-
-      static bool defined()
-      {
-	return global_log != nullptr;
-      }
-
-      static OPENVPN_LOG_CLASS* obj()
-      {
-	return global_log;
-      }
+        friend struct Context;
+        OPENVPN_LOG_CLASS *log;
     };
+
+    // While in scope, turns on global_log
+    // for this thread.
+    Context(const Wrapper &wrap)
+    {
+        global_log = wrap.log;
+    }
+
+    Context(OPENVPN_LOG_CLASS *cli)
+    {
+        global_log = cli;
+    }
+
+    ~Context()
+    {
+        global_log = nullptr;
+    }
+
+    static bool defined()
+    {
+        return global_log != nullptr;
+    }
+
+    static OPENVPN_LOG_CLASS *obj()
+    {
+        return global_log;
+    }
+};
 #endif
-  }
-}
+} // namespace Log
+} // namespace openvpn
 
 #endif

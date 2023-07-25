@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 project (CefVPN)
 
-# Set CEF Version
+# Set CPP Version.
+set(CMAKE_CXX_STANDARD 17)
+
+# Set CEF Version.
 set(CEF_BIN_VERSION "cef_binary_112.3.0+gb09c4ca+chromium-112.0.5615.165")
 
 # Cmake Modules.

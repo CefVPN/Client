@@ -15,7 +15,6 @@ export const SidebarData = [
     {
         title: "Themify",
         icon: <IconPalette />,
-        link: "/themify"
     },
     {
         title: "Settings",
