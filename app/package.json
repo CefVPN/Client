@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "start": "webpack serve",
+    "start": "react-scripts start",
+    "serve": "webpack serve",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

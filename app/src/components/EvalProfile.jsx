@@ -2,9 +2,8 @@ import React from 'react'
 import { useState } from 'react'
 import { TextField } from '@mui/material';
 
-const EvalProfile = ({profileName, isUserLocked, isAutoLogin}) => {
+const EvalProfile = ({exitModal, profileName, isUserLocked, isAutoLogin}) => {
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [configName, setConfigName] = useState(profileName);
 
@@ -12,22 +11,24 @@ const EvalProfile = ({profileName, isUserLocked, isAutoLogin}) => {
     setConfigName(event.target.value)
   }
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  }
-
-  function openModal() {
-    setIsModalOpen(true);
-  }
 
   return (
-    <div className="evalModal">
+    <div className="evalModal ">
       <div>
         <h2 className="flex text-white justify-center text-xl">
           Evaluate Profile
         </h2>
-        <div className='InputField mt-5'>
-          <TextField spellCheck={false} placeholder={profileName} id="profileName" onChange={handleConfigName} value={configName} label={"Profile Name"} variant="outlined" />
+        <div className='InputField mt-5 w-full h-full'>
+          <div className="status text-white mt-10">
+            Profile Evaluated Successfully.
+          </div>
+          <button
+          type="button"
+          onClick={() => exitModal()}
+          className="rounded-md bg-blue-600 mt-14 ml-44 bg-opacity-20 px-6 py-3 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          >
+            Done!
+          </button>
         </div>
       </div>
     </div>

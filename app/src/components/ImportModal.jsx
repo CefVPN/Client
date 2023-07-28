@@ -47,6 +47,11 @@ const ImportModal = ({ modalIsOpen, closeModal }) => {
     setIndex(1);
   }
 
+  function resetModal() {
+    setIndex(0);
+    closeModal();
+  }
+
   function slideRenderer(params) {
     const { index } = params;
     let component;
@@ -56,7 +61,7 @@ const ImportModal = ({ modalIsOpen, closeModal }) => {
         component = <ImportProfile handleFileOpen={() => openFile(handleClick)} />;
         break;
       case 1:
-        component = <EvalProfile profileName={importConfigProfile} />;
+        component = <EvalProfile exitModal={resetModal} profileName={importConfigProfile} />;
         break;
       default:
         break;
@@ -67,10 +72,7 @@ const ImportModal = ({ modalIsOpen, closeModal }) => {
   return (
     <ModalComponent
       isOpen={modalIsOpen}
-      closeModal={() => {
-        setIndex(0);
-        closeModal();
-      }}
+      closeModal={() => resetModal()}
     >
       <VirtualViews
         index={index}
