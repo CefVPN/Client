@@ -14,6 +14,7 @@ using namespace openvpn;
 void cefvpn::Client::event(const ClientAPI::Event &ev)
 {
   std::cout << ev.info;
+  //std::cout << ev.name + "\n";
 
   cefvpn::ovpn::isConnected = ev.name == "CONNECTED" ? true : false;
 
@@ -44,7 +45,7 @@ bool cefvpn::Client::pause_on_connection_timeout() { return false; }
 
  // GLOBAL
 //cefvpn::Client *the_client;
-std::unique_ptr<cefvpn::Client> the_client(new cefvpn::Client());
+std::unique_ptr<cefvpn::Client> the_client;
 
 std::string cefvpn::ovpn::content = "NULL";
 bool cefvpn::ovpn::isProfileImported = false;
@@ -55,7 +56,7 @@ static CefRefPtr<CefBrowser> cef_browser;
 void cefvpn::ovpn::ImportProfile(std::string content, CefRefPtr<CefBrowser> browser)
 {
  //
- //the_client = std::make_unique<Client>();
+ the_client = std::make_unique<Client>();
  //the_client = new Client();
 
   ClientAPI::Config config;
@@ -68,6 +69,16 @@ void cefvpn::ovpn::ImportProfile(std::string content, CefRefPtr<CefBrowser> brow
     config.content = content;
     EvalConfigInfo(config, browser);
   }
+}
+
+void reEvalConfig(std::string profileContent) {
+  the_client = std::make_unique<cefvpn::Client>();
+
+  ClientAPI::Config config;
+  config.dco = false;
+  config.content = profileContent;
+
+  the_client->eval_config(config);
 }
 
 void cefvpn::ovpn::EvalConfigInfo(ClientAPI::Config config, CefRefPtr<CefBrowser> browser)
@@ -90,6 +101,7 @@ void cefvpn::ovpn::EvalConfigInfo(ClientAPI::Config config, CefRefPtr<CefBrowser
 void cefvpn::ovpn::connect()
 {
   if(isProfileImported) {
+    reEvalConfig(cefvpn::ovpn::content);
     ClientAPI::Status status = the_client->connect();
   } else {
     std::cout << "Please Import Profile Before Connecting to VPN...\n";

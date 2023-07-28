@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from 'react'
-import { Handler, Disconnect, isFullscreen } from '../components/Handler'
-import EvalProfile from '../components/EvalProfile';
+import { Handler, Disconnect, isFullscreen } from '../components/Handler.jsx'
+import EvalProfile from '../components/EvalProfile.jsx';
 
 
 export default function Dash() {

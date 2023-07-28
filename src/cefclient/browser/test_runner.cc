@@ -167,7 +167,7 @@ class PromptHandler : public CefMessageRouterBrowserSide::Handler {
   // Called due to cefQuery execution.
   virtual bool OnQuery(CefRefPtr<CefBrowser> browser,
                        CefRefPtr<CefFrame> frame,
-                       int64 query_id,
+                       int64_t query_id,
                        const CefString& request,
                        bool persistent,
                        CefRefPtr<Callback> callback) override {
@@ -759,12 +759,6 @@ void SetupResourceManager(CefRefPtr<CefResourceManager> resource_manager,
       CreateBinaryResourceProvider(test_origin, std::string()), 100,
       std::string());
 
-  // Read resources from a directory on disk.
-  std::string resource_dir = "C:/Users/skill/Dev/CefVPN/app/build";
-  if (!resource_dir.empty()) {
-    resource_manager->AddDirectoryProvider(test_origin, resource_dir, 100,
-                                           std::string());
-  }
 #elif defined(OS_POSIX)
   std::string resource_dir = "//home//op//Dev//CefVPN//app//out";
   if (!resource_dir.empty()) {

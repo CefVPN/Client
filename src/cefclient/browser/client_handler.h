@@ -85,9 +85,6 @@ class ClientHandler : public CefClient,
     // Called on the UI thread before a context menu is displayed.
     virtual void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {}
 
-    // Called when User is Over Maximize Button.
-    virtual void OnMaximizeHover(bool state) = 0;
-
    protected:
     virtual ~Delegate() {}
   };
@@ -142,13 +139,18 @@ class ClientHandler : public CefClient,
   bool OnChromeCommand(CefRefPtr<CefBrowser> browser,
                        int command_id,
                        cef_window_open_disposition_t disposition) override;
+  bool IsChromeAppMenuItemVisible(CefRefPtr<CefBrowser> browser,
+                                  int command_id) override;
+  bool IsChromePageActionIconVisible(
+      cef_chrome_page_action_icon_type_t icon_type) override;
+  bool IsChromeToolbarButtonVisible(
+      cef_chrome_toolbar_button_type_t button_type) override;
 
   // CefContextMenuHandler methods
   void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
                            CefRefPtr<CefFrame> frame,
                            CefRefPtr<CefContextMenuParams> params,
                            CefRefPtr<CefMenuModel> model) override;
-
   bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
                             CefRefPtr<CefFrame> frame,
                             CefRefPtr<CefContextMenuParams> params,
@@ -242,7 +244,7 @@ class ClientHandler : public CefClient,
       CefRefPtr<CefBrowser> browser,
       CefRefPtr<CefFrame> frame,
       const CefString& requesting_origin,
-      uint32 requested_permissions,
+      uint32_t requested_permissions,
       CefRefPtr<CefMediaAccessCallback> callback) override;
 
   // CefRequestHandler methods
@@ -367,7 +369,6 @@ class ClientHandler : public CefClient,
   void NotifyAutoResize(const CefSize& new_size);
   void NotifyLoadingState(bool isLoading, bool canGoBack, bool canGoForward);
   void NotifyDraggableRegions(const std::vector<CefDraggableRegion>& regions);
-  void NotifyMaximizeHover(bool state);
   void NotifyTakeFocus(bool next);
 
   // Test context menu creation.
@@ -375,10 +376,6 @@ class ClientHandler : public CefClient,
   bool ExecuteTestMenu(int command_id);
 
   void SetOfflineState(CefRefPtr<CefBrowser> browser, bool offline);
-
-  // Filter menu and keyboard shortcut commands.
-  void FilterMenuModel(CefRefPtr<CefMenuModel> model);
-  bool IsAllowedCommandId(int command_id);
 
   // THREAD SAFE MEMBERS
   // The following members may be accessed from any thread.
@@ -401,8 +398,11 @@ class ClientHandler : public CefClient,
   // True if the browser is currently offline.
   bool offline_;
 
+  // True if the Chrome toolbar and menu contents/commands should be filtered.
+  bool filter_chrome_commands_;
+
   // True if Favicon images should be downloaded.
-  bool download_favicon_images_;
+  bool download_favicon_images_ = false;
 
 #if defined(OS_LINUX)
   // Custom dialog handlers for GTK.
@@ -440,17 +440,16 @@ class ClientHandler : public CefClient,
   } test_menu_state_;
 
   // The current number of browsers using this handler.
-  int browser_count_;
+  int browser_count_ = 0;
 
   // Console logging state.
   const std::string console_log_file_;
-  bool first_console_message_;
 
   // True if an editable field currently has focus.
-  bool focus_on_editable_field_;
+  bool focus_on_editable_field_ = false;
 
   // True for the initial navigation after browser creation.
-  bool initial_navigation_;
+  bool initial_navigation_ = true;
 
   // Set of Handlers registered with the message router.
   MessageHandlerSet message_handler_set_;

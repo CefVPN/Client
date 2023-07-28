@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import ModalComponent from "./Modal";
+import ModalComponent from "./Modal.jsx";
 import SwipeableViews from "react-swipeable-views";
 import { virtualize } from "react-swipeable-views-utils";
 import { mod } from "react-swipeable-views-core";
-import EvalProfile from "./EvalProfile";
-import ImportProfile from "./ImportProfile";
+import EvalProfile from "./EvalProfile.jsx";
+import ImportProfile from "./ImportProfile.jsx";
 //import fs from 'fs'
 
 const VirtualViews = virtualize(SwipeableViews);

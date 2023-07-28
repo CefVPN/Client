@@ -5,7 +5,7 @@ project (CefVPN)
 set(CMAKE_CXX_STANDARD 17)
 
 # Set CEF Version.
-set(CEF_BIN_VERSION "cef_binary_112.3.0+gb09c4ca+chromium-112.0.5615.165")
+set(CEF_BIN_VERSION "cef_binary_115.3.9+gaa348cb+chromium-115.0.5790.99")
 
 # Cmake Modules.
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -13,11 +13,11 @@ set(CEF_ROOT ${PROJECT_SOURCE_DIR})
 include("FindCEF")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CONFIG "Debug")
-    set(COMPILE_DEF -D_NDEBUG)
+  set(CONFIG "Debug")
+  #set(COMPILE_DEF )
 else()
-    set(CONFIG "Release")
-    set(COMPILE_DEF -DNDEBUG)
+  set(CONFIG "Release")
+  set(COMPILE_DEF -DNDEBUG -D_NDEBUG)
 endif()
 
 #Source Files...
@@ -412,25 +412,28 @@ if(OS_WINDOWS)
         ${CEF_BIN_ROOT}/${CONFIG}/libcef.lib
         ${CEF_LIBCEF_DLL_LIB}/${CONFIG}/libcef_dll_wrapper.lib
         ${CEF_BIN_ROOT}/${CONFIG}/cef_sandbox.lib
-        Ws2_32.lib
-        Dbghelp.lib
-        Shlwapi.lib
-        Version.lib
-        Setupapi.lib
-        Propsys.lib
-        Powrprof.lib
-        Winmm.lib
-        delayimp.lib
-        Opengl32.lib
-        Oleacc.lib
-        Imm32.lib
-        D3D11.lib
-        Shell32.lib
-        Dwmapi.lib
-        Userenv.lib
-        Shcore.lib
+        comctl32.lib
+        gdi32.lib
+        rpcrt4.lib
+        shlwapi.lib
+        ws2_32.lib
+        Advapi32.lib
+        dbghelp.lib
+        Delayimp.lib
         ntdll.lib
-        runtimeobject.lib
+        OleAut32.lib
+        PowrProf.lib
+        Propsys.lib
+        psapi.lib
+        SetupAPI.lib
+        Shell32.lib
+        Shcore.lib
+        Userenv.lib
+        version.lib
+        wbemuuid.lib
+        WindowsApp.lib
+        winmm.lib
+        Dwmapi.lib
         ${OPENVPN3_DEP_LIBS}
     )
 

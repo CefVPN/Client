@@ -1,8 +1,9 @@
-import { React, useState } from "react";
-import { SidebarData } from "./SidebarData";
-import ImportProfile from "./ImportModal"
+import React from "react";
+import { useState } from "react";
+import { SidebarData } from "./SidebarData.js";
+import ImportProfile from "./ImportModal.jsx"
 import { NavLink, useLocation } from "react-router-dom";
-import EvalProfile from "./EvalProfile";
+import EvalProfile from "./EvalProfile.jsx";
 import "../styles/app.css"
 
 export default function Sidebar() {
@@ -55,7 +56,7 @@ export default function Sidebar() {
               >
                 <NavLink
                   className={({isActive}) => `sidebarlist flex pl-2 pt-4 pb-4 transition-colors duration-100 `}
-                  to={val.link === "/import" || "/themify" && val.link } // val.link != null && val.link
+                  to={val.link != "/import" && val.link } // val.link != null && val.link
                   onClick={() => {
                     if(val.link == "/import") {
                       if(val.title === "Import Profile") { 
@@ -89,6 +90,7 @@ export default function Sidebar() {
           })}
         </ul>
       </div>
+        
     </>
   );
 }

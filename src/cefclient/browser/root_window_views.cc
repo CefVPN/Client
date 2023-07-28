@@ -445,10 +445,6 @@ void RootWindowViews::OnSetDraggableRegions(
     window_->SetDraggableRegions(regions);
 }
 
-void RootWindowViews::OnMaximizeHover(bool state) {
-  // TODO: if Views Used on Windows...
-}
-
 void RootWindowViews::OnTakeFocus(bool next) {
   if (!CefCurrentlyOn(TID_UI)) {
     // Execute this method on the UI thread.

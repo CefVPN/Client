@@ -1,10 +1,10 @@
 import { ReactDOM } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
-import Dash from './pages/Dash'
-import Settings from './pages/config'
-import Titlebar from './components/Titlebar';
-import Sidebar from './components/Sidebar';
+import Dash from './pages/Dash.jsx'
+import Settings from './pages/config.jsx'
+import Titlebar from './components/Titlebar.jsx';
+import Sidebar from './components/Sidebar.jsx';
 
 
 function App() { 

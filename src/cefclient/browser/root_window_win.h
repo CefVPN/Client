@@ -107,7 +107,6 @@ class RootWindowWin : public RootWindow, public BrowserWindow::Delegate {
                          bool canGoForward) override;
   void OnSetDraggableRegions(
       const std::vector<CefDraggableRegion>& regions) override;
-  void OnMaximizeHover(bool state) override;
   void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) override;
   void NotifyDestroyedIfDone();
 

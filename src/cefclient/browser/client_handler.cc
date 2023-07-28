@@ -318,6 +318,135 @@ void OnTestSMRProcessMessageReceived(
   frame->SendProcessMessage(PID_RENDERER, builder->Build());
 }
 
+bool IsAllowedPageActionIcon(cef_chrome_page_action_icon_type_t icon_type) {
+  // Only the specified icons will be allowed.
+  switch (icon_type) {
+    case CEF_CPAIT_FIND:
+    case CEF_CPAIT_ZOOM:
+      return true;
+    default:
+      break;
+  }
+  return false;
+}
+
+bool IsAllowedToolbarButton(cef_chrome_toolbar_button_type_t button_type) {
+  // All configurable buttons will be disabled.
+  return false;
+}
+
+bool IsAllowedAppMenuCommandId(int command_id) {
+  // Only the commands in this array will be allowed.
+  static const int kAllowedCommandIds[] = {
+      IDC_NEW_WINDOW,
+      IDC_NEW_INCOGNITO_WINDOW,
+
+      // Zoom buttons.
+      IDC_ZOOM_MENU,
+      IDC_ZOOM_PLUS,
+      IDC_ZOOM_NORMAL,
+      IDC_ZOOM_MINUS,
+      IDC_FULLSCREEN,
+
+      IDC_PRINT,
+      IDC_FIND,
+      IDC_FIND_NEXT,
+      IDC_FIND_PREVIOUS,
+
+      // "More tools" sub-menu and contents.
+      IDC_MORE_TOOLS_MENU,
+      IDC_CLEAR_BROWSING_DATA,
+      IDC_MANAGE_EXTENSIONS,
+      IDC_PERFORMANCE,
+      IDC_TASK_MANAGER,
+      IDC_DEV_TOOLS,
+
+      // Edit buttons.
+      IDC_EDIT_MENU,
+      IDC_CUT,
+      IDC_COPY,
+      IDC_PASTE,
+
+      IDC_OPTIONS,
+      IDC_EXIT,
+  };
+  for (size_t i = 0; i < std::size(kAllowedCommandIds); ++i) {
+    if (command_id == kAllowedCommandIds[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool IsAllowedContextMenuCommandId(int command_id) {
+  // Allow commands added by web content.
+  if (command_id >= IDC_CONTENT_CONTEXT_CUSTOM_FIRST &&
+      command_id <= IDC_CONTENT_CONTEXT_CUSTOM_LAST) {
+    return true;
+  }
+
+  // Allow commands added by extensions.
+  if (command_id >= IDC_EXTENSIONS_CONTEXT_CUSTOM_FIRST &&
+      command_id <= IDC_EXTENSIONS_CONTEXT_CUSTOM_LAST) {
+    return true;
+  }
+
+  // Only the commands in this array will be allowed.
+  static const int kAllowedCommandIds[] = {
+      // Page navigation.
+      IDC_BACK,
+      IDC_FORWARD,
+      IDC_RELOAD,
+      IDC_RELOAD_BYPASSING_CACHE,
+      IDC_RELOAD_CLEARING_CACHE,
+      IDC_STOP,
+
+      // Printing.
+      IDC_PRINT,
+
+      // Edit controls.
+      IDC_CONTENT_CONTEXT_CUT,
+      IDC_CONTENT_CONTEXT_COPY,
+      IDC_CONTENT_CONTEXT_PASTE,
+      IDC_CONTENT_CONTEXT_PASTE_AND_MATCH_STYLE,
+      IDC_CONTENT_CONTEXT_DELETE,
+      IDC_CONTENT_CONTEXT_SELECTALL,
+      IDC_CONTENT_CONTEXT_UNDO,
+      IDC_CONTENT_CONTEXT_REDO,
+  };
+  for (size_t i = 0; i < std::size(kAllowedCommandIds); ++i) {
+    if (command_id == kAllowedCommandIds[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void FilterContextMenuModel(CefRefPtr<CefMenuModel> model) {
+  // Evaluate from the bottom to the top because we'll be removing menu items.
+  for (size_t x = model->GetCount(); x > 0; --x) {
+    const auto i = x - 1;
+    const auto type = model->GetTypeAt(i);
+    if (type == MENUITEMTYPE_SUBMENU) {
+      // Filter sub-menu and remove if empty.
+      auto sub_model = model->GetSubMenuAt(i);
+      FilterContextMenuModel(sub_model);
+      if (sub_model->GetCount() == 0) {
+        model->RemoveAt(i);
+      }
+    } else if (type == MENUITEMTYPE_SEPARATOR) {
+      // A separator shouldn't be the first or last element in the menu, and
+      // there shouldn't be multiple in a row.
+      if (i == 0 || i == model->GetCount() - 1 ||
+          model->GetTypeAt(i + 1) == MENUITEMTYPE_SEPARATOR) {
+        model->RemoveAt(i);
+      }
+    } else if (!IsAllowedContextMenuCommandId(model->GetCommandIdAt(i))) {
+      model->RemoveAt(i);
+    }
+  }
+}
+
 }  // namespace
 
 
@@ -352,7 +481,6 @@ ClientHandler::ClientHandler(Delegate* delegate,
       delegate_(delegate),
       browser_count_(0),
       console_log_file_(MainContext::Get()->GetConsoleLogPath()),
-      first_console_message_(false),
       focus_on_editable_field_(false),
       initial_navigation_(true) {
   DCHECK(!console_log_file_.empty());
@@ -487,12 +615,6 @@ bool ClientHandler::OnProcessMessageReceived(
     window->Hide();
 
     //window->Close();
-
-  } else if(message->GetName() == "OnSnapLayouts:1") {
-    ClientHandler::NotifyMaximizeHover(true);
-
-  } else if(message->GetName() == "OnSnapLayouts:0") {
-    ClientHandler::NotifyMaximizeHover(false);
   } else if(message->GetName() == "importProfile") {
 
     CefRefPtr<CefListValue> arg_list = message->GetArgumentList();
@@ -549,10 +671,20 @@ bool ClientHandler::OnChromeCommand(CefRefPtr<CefBrowser> browser,
   CEF_REQUIRE_UI_THREAD();
   DCHECK(MainContext::Get()->UseChromeRuntime());
 
-  if (!with_controls_ &&
-      (disposition != WOD_CURRENT_TAB || !IsAllowedCommandId(command_id))) {
-    // Block everything that doesn't target the current tab or isn't an
-    // allowed command ID.
+  const bool allowed = IsAllowedAppMenuCommandId(command_id) ||
+                       IsAllowedContextMenuCommandId(command_id);
+
+  bool block = false;
+  if (filter_chrome_commands_) {
+    // Block all commands that aren't specifically allowed.
+    block = !allowed;
+  } else if (!with_controls_) {
+    // If controls are hidden, block all commands that don't target the current
+    // tab or aren't specifically allowed.
+    block = disposition != WOD_CURRENT_TAB || !allowed;
+  }
+
+  if (block) {
     LOG(INFO) << "Blocking command " << command_id << " with disposition "
               << disposition;
     return true;
@@ -560,6 +692,36 @@ bool ClientHandler::OnChromeCommand(CefRefPtr<CefBrowser> browser,
 
   // Default handling.
   return false;
+}
+
+bool ClientHandler::IsChromeAppMenuItemVisible(CefRefPtr<CefBrowser> browser,
+                                               int command_id) {
+  CEF_REQUIRE_UI_THREAD();
+  DCHECK(MainContext::Get()->UseChromeRuntime());
+  if (!filter_chrome_commands_) {
+    return true;
+  }
+  return IsAllowedAppMenuCommandId(command_id);
+}
+
+bool ClientHandler::IsChromePageActionIconVisible(
+    cef_chrome_page_action_icon_type_t icon_type) {
+  CEF_REQUIRE_UI_THREAD();
+  DCHECK(MainContext::Get()->UseChromeRuntime());
+  if (!filter_chrome_commands_) {
+    return true;
+  }
+  return IsAllowedPageActionIcon(icon_type);
+}
+
+bool ClientHandler::IsChromeToolbarButtonVisible(
+    cef_chrome_toolbar_button_type_t button_type) {
+  CEF_REQUIRE_UI_THREAD();
+  DCHECK(MainContext::Get()->UseChromeRuntime());
+  if (!filter_chrome_commands_) {
+    return true;
+  }
+  return IsAllowedToolbarButton(button_type);
 }
 
 void ClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
@@ -573,7 +735,7 @@ void ClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
   const bool use_chrome_runtime = MainContext::Get()->UseChromeRuntime();
   if (use_chrome_runtime && !with_controls_) {
     // Remove all disallowed menu items.
-    FilterMenuModel(model);
+    FilterContextMenuModel(model);
   }
 
   if ((params->GetTypeFlags() & (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME)) != 0) {
@@ -700,12 +862,6 @@ bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
        << NEWLINE << "-----------------------" << NEWLINE;
     fputs(ss.str().c_str(), file);
     fclose(file);
-
-    if (first_console_message_) {
-      test_runner::Alert(
-          browser, "Console messages written to \"" + console_log_file_ + "\"");
-      first_console_message_ = false;
-    }
   }
 
   return false;
@@ -959,7 +1115,7 @@ bool ClientHandler::OnRequestMediaAccessPermission(
     CefRefPtr<CefBrowser> browser,
     CefRefPtr<CefFrame> frame,
     const CefString& requesting_origin,
-    uint32 requested_permissions,
+    uint32_t requested_permissions,
     CefRefPtr<CefMediaAccessCallback> callback) {
   callback->Continue(media_handling_disabled_ ? CEF_MEDIA_PERMISSION_NONE
                                               : requested_permissions);
@@ -1428,10 +1584,6 @@ void ClientHandler::NotifyDraggableRegions(
     delegate_->OnSetDraggableRegions(regions);
 }
 
-void ClientHandler::NotifyMaximizeHover(bool state) {
-  if(delegate_)
-    delegate_->OnMaximizeHover(state);
-}
 
 void ClientHandler::NotifyTakeFocus(bool next) {
   if (!CURRENTLY_ON_MAIN_THREAD()) {
@@ -1471,62 +1623,6 @@ void ClientHandler::SetOfflineState(CefRefPtr<CefBrowser> browser,
   params->SetDouble("uploadThroughput", 0);
   browser->GetHost()->ExecuteDevToolsMethod(
       /*message_id=*/0, "Network.emulateNetworkConditions", params);
-}
-
-void ClientHandler::FilterMenuModel(CefRefPtr<CefMenuModel> model) {
-  // Evaluate from the bottom to the top because we'll be removing menu items.
-  for (size_t x = model->GetCount(); x > 0; --x) {
-    const auto i = x - 1;
-    const auto type = model->GetTypeAt(i);
-    if (type == MENUITEMTYPE_SUBMENU) {
-      // Filter sub-menu and remove if empty.
-      auto sub_model = model->GetSubMenuAt(i);
-      FilterMenuModel(sub_model);
-      if (sub_model->GetCount() == 0) {
-        model->RemoveAt(i);
-      }
-    } else if (type == MENUITEMTYPE_SEPARATOR) {
-      // A separator shouldn't be the first or last element in the menu, and
-      // there shouldn't be multiple in a row.
-      if (i == 0 || i == model->GetCount() - 1 ||
-          model->GetTypeAt(i + 1) == MENUITEMTYPE_SEPARATOR) {
-        model->RemoveAt(i);
-      }
-    } else if (!IsAllowedCommandId(model->GetCommandIdAt(i))) {
-      model->RemoveAt(i);
-    }
-  }
-}
-
-bool ClientHandler::IsAllowedCommandId(int command_id) {
-  // Only the commands in this array will be allowed.
-  static const int kAllowedCommandIds[] = {
-      // Page navigation.
-      IDC_BACK,
-      IDC_FORWARD,
-      IDC_RELOAD,
-      IDC_RELOAD_BYPASSING_CACHE,
-      IDC_RELOAD_CLEARING_CACHE,
-      IDC_STOP,
-
-      // Printing.
-      IDC_PRINT,
-
-      // Edit controls.
-      IDC_CONTENT_CONTEXT_CUT,
-      IDC_CONTENT_CONTEXT_COPY,
-      IDC_CONTENT_CONTEXT_PASTE,
-      IDC_CONTENT_CONTEXT_PASTE_AND_MATCH_STYLE,
-      IDC_CONTENT_CONTEXT_DELETE,
-      IDC_CONTENT_CONTEXT_SELECTALL,
-      IDC_CONTENT_CONTEXT_UNDO,
-      IDC_CONTENT_CONTEXT_REDO,
-  };
-  for (size_t i = 0; i < std::size(kAllowedCommandIds); ++i) {
-    if (command_id == kAllowedCommandIds[i])
-      return true;
-  }
-  return false;
 }
 
 }  // namespace client

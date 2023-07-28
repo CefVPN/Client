@@ -1750,9 +1750,4 @@ void RootWindowWin::OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {
 
 }
 
-void RootWindowWin::OnMaximizeHover(bool state) {
-  onMaxButton_ = state;
-  MaximizeButtonHovered = state;
-}
-
 }  // namespace client

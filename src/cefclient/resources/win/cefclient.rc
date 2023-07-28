@@ -31,12 +31,10 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDS_BINDING_HTML BINARY "..\\binding.html"
 IDS_DIALOGS_HTML BINARY "..\\dialogs.html"
+IDS_LOGO_PNG BINARY "..\\logo.png"
 IDS_DRAGGABLE_HTML BINARY "..\\draggable.html"
-IDS_SPLASH_SCREEN_HTML BINARY "..\\splash.html"
 IDS_IPC_PERFORMANCE_HTML BINARY "..\\ipc_performance.html"
 IDS_LOCALSTORAGE_HTML BINARY "..\\localstorage.html"
-IDS_LOGO_PNG BINARY "..\\logo.png"
-IDS_CEFVPN_LOGO_PNG BINARY "..\\CefVPN.png"
 IDS_MEDIA_ROUTER_HTML BINARY "..\\media_router.html"
 IDS_MENU_ICON_1X_PNG BINARY "..\\menu_icon.1x.png"
 IDS_MENU_ICON_2X_PNG BINARY "..\\menu_icon.2x.png"
@@ -56,6 +54,13 @@ IDS_WINDOW_HTML BINARY "..\\window.html"
 IDS_WINDOW_ICON_1X_PNG BINARY "..\\..\\..\\shared\\resources\\window_icon.1x.png"
 IDS_WINDOW_ICON_2X_PNG BINARY "..\\..\\..\\shared\\resources\\window_icon.2x.png"
 IDS_XMLHTTPREQUEST_HTML BINARY "..\\xmlhttprequest.html"
+
+// CefVPN
+IDS_CEFVPN_LOGO_PNG BINARY "..\\CefVPN.png"
+IDS_SPLASH_SCREEN_HTML BINARY "..\\splash.html"
+IDS_CEFVPN_INDEX_HTML BINARY "..\\..\\..\\..\\app\\build\\index.html"
+IDS_CEFVPN_INDEX_JS BINARY "..\\..\\..\\..\\app\\build\\index.js"
+
 
 IDS_EXTENSIONS_SET_PAGE_COLOR_ICON_PNG BINARY "..\\extensions\\set_page_color\\icon.png"
 IDS_EXTENSIONS_SET_PAGE_COLOR_MANIFEST_JSON BINARY "..\\extensions\\set_page_color\\manifest.json"

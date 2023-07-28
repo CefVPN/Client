@@ -55,8 +55,6 @@ class BrowserWindow : public ClientHandler::Delegate {
 
     virtual void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) {}
 
-    virtual void OnMaximizeHover(bool state) = 0;
-
    protected:
     virtual ~Delegate() {}
   };
@@ -138,7 +136,6 @@ class BrowserWindow : public ClientHandler::Delegate {
 
   void OnBeforeContextMenu(CefRefPtr<CefMenuModel> model) override;
 
-  void OnMaximizeHover(bool state) override;
 
   Delegate* delegate_;
   CefRefPtr<CefBrowser> browser_;

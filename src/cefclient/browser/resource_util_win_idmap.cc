@@ -18,6 +18,8 @@ int GetResourceId(const char* resource_name) {
                       {"draggable.html", IDS_DRAGGABLE_HTML},
                       {"splash.html", IDS_SPLASH_SCREEN_HTML},
                       {"CefVPN.png", IDS_CEFVPN_LOGO_PNG},
+                      {"index.html", IDS_CEFVPN_INDEX_HTML},
+                      {"index.js", IDS_CEFVPN_INDEX_JS},
                       {"extensions/set_page_color/icon.png",
                        IDS_EXTENSIONS_SET_PAGE_COLOR_ICON_PNG},
                       {"extensions/set_page_color/manifest.json",
