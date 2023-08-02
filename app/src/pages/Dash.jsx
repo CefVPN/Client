@@ -1,21 +1,14 @@
-import { React, useState, useEffect } from 'react'
-import { Handler, Disconnect, isFullscreen } from '../components/Handler.jsx'
-import EvalProfile from '../components/EvalProfile.jsx';
+import { React } from 'react'
+import { Disconnect } from '../components/Handler.jsx'
 
+export const Dash = ({isConnected, setIsConnected, isConnecting, setIsConnecting}) => {
 
-export default function Dash() {
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseOver = () => {
-    setIsHovering(true);
-  };
-
-  const handleMouseOut = () => {
-    setIsHovering(false);
-  };
-
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  function Connect() {
+    window.str_cr('update', function(state) {
+      setIsConnecting(!state);
+      setIsConnected(state);
+    });
+  }
 
   function Power() {
     if(isConnected || isConnecting) {
@@ -24,14 +17,13 @@ export default function Dash() {
       }
       Disconnect();
     } else {
-      window.str_cr('update', function(state) {
-        setIsConnecting(state);
-        setIsConnected(!state);
-      });
+      Connect();
     }
-    if(!isConnected)    
+    if(!isConnected) {
       setIsConnecting(!isConnecting)
-  }   
+    }
+  }
+
   return (
     
     <div className="text-white absolute h-screen w-screen pl-5">

@@ -587,16 +587,6 @@ bool ClientHandler::OnProcessMessageReceived(
     std::cout << "[CefVPN:EXEC: CONNECT]\n";
     std::thread c(cefvpn::ovpn::connect);
     c.detach();
-
-    CefRefPtr<CefProcessMessage> Ignit_stat = CefProcessMessage::Create("CONNECT:STAT");
-      
-    CefRefPtr<CefListValue> args = Ignit_stat->GetArgumentList();
-
-      std::string arg_msg = "STATUS:CONNECTED";
-
-      args->SetString(0, arg_msg);
-
-      browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, Ignit_stat);
   } else if(message->GetName() == "dis_cr") {
     std::cout << "[CefVPN:EXEC: DISCONNECT]\n";
     std::thread d(cefvpn::ovpn::disconnect);

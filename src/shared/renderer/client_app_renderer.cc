@@ -16,9 +16,6 @@ void ClientAppRenderer::OnWebKitInitialized() {
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnWebKitInitialized(this);
-
-
-
 }
 
 void ClientAppRenderer::OnBrowserCreated(
@@ -27,7 +24,6 @@ void ClientAppRenderer::OnBrowserCreated(
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
     (*it)->OnBrowserCreated(this, browser, extra_info);
-
 }
 
 void ClientAppRenderer::OnBrowserDestroyed(CefRefPtr<CefBrowser> browser) {
@@ -54,19 +50,20 @@ void ClientAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
 
   _cefV8Handler = new Cefvpn_v8Handler();
 
-  object->SetValue("str_cr", CefV8Value::CreateFunction("str_cr", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  std::vector<std::string> properties = {
+    "str_cr",
+    "dis_cr",
+    "min_wnd",
+    "max_wnd",
+    "hide_wnd",
+    "OnSnapLayouts",
+    "importProfile"
+  };
 
-  object->SetValue("dis_cr", CefV8Value::CreateFunction("dis_cr", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  for (const auto& property : properties) {
+    object->SetValue(property.c_str(), CefV8Value::CreateFunction(property.c_str(), _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
+  }
 
-  object->SetValue("min_wnd", CefV8Value::CreateFunction("min_wnd", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
-
-  object->SetValue("max_wnd", CefV8Value::CreateFunction("max_wnd", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
-
-  object->SetValue("hide_wnd", CefV8Value::CreateFunction("hide_wnd", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
-
-  object->SetValue("OnSnapLayouts", CefV8Value::CreateFunction("OnSnapLayouts", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE); 
-
-  object->SetValue("importProfile", CefV8Value::CreateFunction("importProfile", _cefV8Handler), V8_PROPERTY_ATTRIBUTE_NONE);
 
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
@@ -76,11 +73,6 @@ void ClientAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
 void ClientAppRenderer::OnContextReleased(CefRefPtr<CefBrowser> browser,
                                           CefRefPtr<CefFrame> frame,
                                           CefRefPtr<CefV8Context> context) {
-
-  //Cefvpn_v8Handler* cefvpn_v8;
-
-  //cefvpn_v8->ReleaseCallbacks(context);
-
   _cefV8Handler->ReleaseCallbacks(context);
 
   DelegateSet::iterator it = delegates_.begin();
@@ -120,22 +112,11 @@ bool ClientAppRenderer::OnProcessMessageReceived(
 
   CefRefPtr<CefV8Context> v8context = browser->GetMainFrame()->GetV8Context();
 
-  if(message->GetName() == "CONNECT:STAT") {
-    CefRefPtr<CefListValue> ig_args = message->GetArgumentList();
-
-    bool connected = ig_args->GetString(0) == "STATUS:CONNECTED" ? true : false;
-
-    if(connected) {
-      //frame->ExecuteJavaScript("alert('SUCESS!: VPN CONNECTED!!!')", frame->GetURL(), 0);
-      handled = true;
-    }
-  } else if(message->GetName() == "CEFVPN:STATE:CONNECTED") {
-
-    //Cefvpn_v8Handler* cefvpn_v8;
-
-    //cefvpn_v8->ExecuteFunction(message->GetName(), browser, nullptr, 0);
+  if(message->GetName() == "CEFVPN:STATE:CONNECTED") {
 
     _cefV8Handler->ExecuteFunction(message->GetName(), browser, nullptr, 0);
+    
+    handled = true;
 
   } else if(message->GetName() == "CEvalInfo") {
     CefRefPtr<CefListValue> CEvalArgs = message->GetArgumentList();
@@ -143,8 +124,6 @@ bool ClientAppRenderer::OnProcessMessageReceived(
     std::string profileName = CEvalArgs->GetString(0);
 
     _cefV8Handler->ExecuteFunction("Import.Profile", browser, CEvalArgs, 0);
-
-    //frame->ExecuteJavaScript("alert('Imported Profile!!!')", frame->GetURL(), 0);
   }
 
   DelegateSet::iterator it = delegates_.begin();

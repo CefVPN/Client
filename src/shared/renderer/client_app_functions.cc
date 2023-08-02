@@ -19,16 +19,14 @@ namespace client
       CefString &exception)
   {
 
-    CefRefPtr<CefV8Context> context = CefV8Context::GetCurrentContext();
+    CefRefPtr<CefV8Context> v8_context = CefV8Context::GetCurrentContext();
+    CefRefPtr<CefFrame> frame = v8_context->GetBrowser()->GetMainFrame();
 
     if (name == "str_cr")
     {
-
       if (arguments.size() == 2 && arguments[1]->IsFunction())
       {
-
-        CefRefPtr<CefV8Context> v8_context = CefV8Context::GetCurrentContext();
-        int browser_id = v8_context->GetBrowser()->GetMainFrame()->GetIdentifier();
+        int browser_id = frame->GetIdentifier();
         std::string message_name = arguments[0]->GetStringValue();
 
         callback_map_.insert(
@@ -39,40 +37,38 @@ namespace client
         );
 
         CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
-        context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+        frame->SendProcessMessage(PID_BROWSER, msg);
       }
     }
     else if (name == "dis_cr")
     {
       CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
 
-      context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+      frame->SendProcessMessage(PID_BROWSER, msg);
     }
     else if (name == "min_wnd")
     {
       CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
 
-      context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+      frame->SendProcessMessage(PID_BROWSER, msg);
     }
     else if (name == "max_wnd")
     {
       CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
 
-      context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+      frame->SendProcessMessage(PID_BROWSER, msg);
     }
     else if (name == "hide_wnd")
     {
       CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
 
-      context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+      frame->SendProcessMessage(PID_BROWSER, msg);
     }
     else if (name == "importProfile")
     {
       if(arguments.size() == 3 && arguments[2]->IsFunction() && !arguments[1]->IsNull()) {
-        CefRefPtr<CefV8Context> v8_context = CefV8Context::GetCurrentContext();
         CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(name);
-        int browserID = context->GetBrowser()->GetMainFrame()->GetIdentifier();
-        std::string msg_id = arguments[0]->GetStringValue();
+        int browserID = frame->GetIdentifier();
 
         if(!arguments[1]->GetStringValue().empty()) {
           callback_map_.insert(
@@ -86,19 +82,8 @@ namespace client
           msg_args->SetString(0, "Profile_Content");
           msg_args->SetString(1, arguments[1]->GetStringValue());
 
-          context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
+          frame->SendProcessMessage(PID_BROWSER, msg);
         }
-      }
-    }
-    else if (name == "OnSnapLayouts")
-    {
-      if (arguments[0]->IsBool())
-      {
-        bool arg = arguments[0]->GetBoolValue();
-
-        CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(arg ? "OnSnapLayouts:1" : "OnSnapLayouts:0");
-
-        context->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
       }
     }
     return false;
@@ -125,15 +110,19 @@ namespace client
           CefRefPtr<CefV8Context> context = it->second.first;
           CefRefPtr<CefV8Value> value = it->second.second;
 
-          context->Enter();
+          
 
           CefV8ValueList args;
 
-          args.push_back(CefV8Value::CreateBool(false));
+          args.push_back(CefV8Value::CreateBool(true));
 
+          context->Enter();
           value->ExecuteFunction(nullptr, args);
 
+          //context->Release();
+          //context->Exit();
           context->Exit();
+          
         }
       }
     } else if(name == "Import.Profile") {
@@ -157,7 +146,6 @@ namespace client
 
           context->Exit();
         }
-
       }
     }
   }

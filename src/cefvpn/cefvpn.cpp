@@ -128,8 +128,6 @@ void cefvpn::ovpn::UpdateConnectState(std::string state)
   CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(VPN_STATE);
 
   cef_browser->GetMainFrame()->SendProcessMessage(PID_RENDERER, msg);
-
-  // std::cout << VPN_STATE << std::endl;
 }
 
 bool cefvpn::OS::Shell_Notify(std::wstring title, std::wstring message)
