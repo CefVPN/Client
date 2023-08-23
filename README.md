@@ -31,13 +31,13 @@
 
 - ### Windows:
 ```
-> git clone https://github.com/CefVPN/CefVPN-Client.git CefVPN && cd CefVPN
+> git clone https://github.com/CefVPN/Client.git CefVPN && cd CefVPN
 > cmake -B bin -S . -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DVCPKG_OVERLAY_PORTS=deps\ports
 > cmake --build bin --config Release --target CefVPN
 ```
 - ### Linux (Debian):
 ```
-$ git clone https://github.com/CefVPN/CefVPN-Client.git CefVPN && cd CefVPN
+$ git clone https://github.com/CefVPN/Client.git CefVPN && cd CefVPN
 $ cmake -S . -B bin -DCMAKE_BUILD_TYPE:STRING=Release
 $ cmake --build bin --config Release --target CefVPN
 ```
