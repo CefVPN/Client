@@ -1,9 +1,12 @@
+> [!IMPORTANT]
+> I have stopped actively working on this project and have not updated it in a long time.
 
 <div align=center>
   <img height=180 width=180 src=https://user-images.githubusercontent.com/76495154/200121487-b5ae885f-2afd-42a1-acb6-31b5708c9343.png>
 
 # CefVPN Client
 **A Chromium Embedded Framework-Based VPN Client.**
+
 </div>
 
 ## Cef/VPN Client?
