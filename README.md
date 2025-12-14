@@ -10,7 +10,7 @@
 </div>
 
 ## Cef/VPN Client?
-**CefVPN Client, is an Application that uses [CEF](https://bitbucket.org/chromiumembedded/cef/) and [OpenVPN3](https://github.com/OpenVPN/openvpn3) to provide a user-friendly and secure Connection to Protect Your Self-online. Unlike the official OpenVPN Connect Client, CefVPN is completely Open Source with a more Advanced UI. Best of all it's the Only VPN that will have built-in theming support.**
+**CefVPN Client is an application that uses [CEF](https://bitbucket.org/chromiumembedded/cef/) and [OpenVPN3](https://github.com/OpenVPN/openvpn3) to provide a user-friendly and secure connection to protect yourself online. Unlike the official OpenVPN Connect client, CefVPN is completely open source with a more advanced UI. Best of all, it's the only VPN that will have built-in theming support.**
 
 ## Supported Platforms (ATM)
 
@@ -18,8 +18,8 @@
 - [X] **Linux (Partial)**
 - [ ] **macOS (Soon)**
 
-## What's Needed to Build?
-- #### Shared Dependencies:
+## What's needed to build?
+- #### Shared dependencies:
   - [cmake](https://cmake.org/)
   - [Node.js](https://nodejs.org/)
   - [Python3](https://www.python.org/)
@@ -30,7 +30,9 @@
   - [GCC](https://gcc.gnu.org/)
 
 ## Let's Build!
-***Note: This Project Does Not Provide CEF binary Files and they Must Be Downloaded From [cef-builds](https://cef-builds.spotifycdn.com/index.html) and placed inside `/lib` and `/bin/(Debug|Release)` Manually. Please Refer to # for Additional Info.*** 
+
+> [!NOTE]
+> ***This project does not provide CEF binary files. They must be downloaded from [cef-builds](https://cef-builds.spotifycdn.com/index.html) and placed inside `/lib` and `/bin/(Debug|Release)` manually.*** 
 
 - ### Windows:
 ```
